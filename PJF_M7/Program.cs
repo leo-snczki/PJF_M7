@@ -30,6 +30,10 @@ namespace PJF_M7
             public Falta[] faltas;
         }
 
+        static string input;
+
+        static int op;
+
         static string[] files = { "nomes.txt", "notas.txt", "faltas.txt" };
 
         static string[] lines;
@@ -96,6 +100,81 @@ namespace PJF_M7
                 }
             }
             else File.Create(files[2]);
+        }
+
+        static void AddStudent()
+        {
+            Array.Resize(ref alunos, alunos.Length + 1);
+            Console.Write("Insira o nome do estudante: ");
+
+            do
+            {
+                input = Console.ReadLine();
+                if (input.Length < 2) Console.Write("O nome não pode ser menor de 3 caracteres: ");
+            } while (input.Length < 2);
+            alunos[alunos.Length - 1].nome = input;
+
+            Console.Write("Insira a turma do estudante: ");
+            do
+            {
+                input = Console.ReadLine();
+                if (input.Length == 0) Console.Write("O nome da turma não pode ser menor de 1 caractere");
+            } while (input.Length == 0);
+            alunos[alunos.Length - 1].turma = input;
+
+            alunos[alunos.Length - 1].numero = alunos.Max(s => s.numero) + 1;
+
+            Array.Sort(alunos, (x, y) => x.nome.CompareTo(y.nome));
+        }
+
+        static void ListStudents()
+        {
+            for(int i = 0; i < alunos.Length; i++)
+            {
+                Console.WriteLine(i + 1 + " - " + alunos[i].nome);
+            }
+        }
+
+        static void EditStudent()
+        {
+            if(alunos.Length > 0)
+            {
+                ListStudents();
+                Console.Write("Insira o estudante que gostaria de editar");
+                do
+                {
+                    int.TryParse(Console.ReadLine(), out op);
+                    if (op <= -1 || op - 1 >= alunos.Length) Console.Write("Valor inválido tente novamente: ");
+                } while (op <= -1 || op - 1 >= alunos.Length);
+
+                Console.WriteLine("1 - Editar notas\n2 - Editar ");
+            }
+            else Console.WriteLine("Não existem estudantes salvos");
+        }
+
+        static void RemoveStudent()
+        {
+            if(alunos.Length > 0) 
+            { 
+                ListStudents();
+                Console.Write("Insira o estudante que gostaria de remover: ");
+                do
+                {
+                    int.TryParse(Console.ReadLine(), out op);
+                    if (op <= -1 || op - 1 >= alunos.Length) Console.Write("Valor inválido tente novamente: ");
+                } while (op <= -1 || op - 1 >= alunos.Length);
+
+                Console.WriteLine($"Tem mesmo a certeza que quer remover {alunos[op - 1].nome}? \nInsire '1' se quiser continuar \nQualquer outro valor cancelerá a operação");
+                
+                input = Console.ReadLine();
+
+                if(input == "1")
+                {
+                    for (int i = op; i < alunos.Length; i++) alunos[i - 1] = alunos[i];
+                    Array.Resize(ref alunos, alunos.Length - 1);
+                }
+            }
+            else Console.WriteLine("Não existem estudantes salvos");
         }
 
         static void Saver()
