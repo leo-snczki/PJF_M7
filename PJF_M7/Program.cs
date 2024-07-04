@@ -127,6 +127,16 @@ namespace PJF_M7
                     input = Console.ReadLine();
                     if (int.Parse(input) < 1 || int.Parse(input) - 1 >= alunos[op].materia.Length) Console.Write("Valor inválido, tente novamente: ");
                 } while ((int.Parse(input) < 1 || int.Parse(input) - 1 >= alunos[op].materia.Length) && input != "");
+                if(input != "")
+                {
+                    for(int i = 0; i < alunos[op].materia.Length; i++)
+                    {
+                        alunos[op].materia[i - 1] = alunos[op].materia[i];
+                        alunos[op].faltas[i - 1] = alunos[op].faltas[i];
+                    }
+                    Array.Resize(ref alunos[op].materia, alunos[op].materia.Length - 1);
+                    Array.Resize(ref alunos[op].faltas, alunos[op].faltas.Length - 1);
+                }
             }
         }
 
