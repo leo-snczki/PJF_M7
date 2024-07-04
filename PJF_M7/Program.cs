@@ -3,6 +3,22 @@ using System.IO;
 
 namespace PJF_M7
 {
+            struct Login
+        {
+            private string user;
+            public string User
+            {
+                get { return user; }
+                set { user = value; }
+            }
+            private string passwd;
+
+            public string Passwd
+            {
+                get { return passwd; }
+                set { passwd = value; }
+            }
+        }
     class Program
     {
         static public string currentDirectory = Directory.GetCurrentDirectory();
@@ -13,6 +29,16 @@ namespace PJF_M7
             ChooseOption();
         }
 
+        static void LoginManager()
+        {
+
+            Login Teacher = new Login();
+
+            Teacher.User = "professor";
+            Teacher.Passwd = "123";
+
+        }
+        
         static void ShowDefaultMenu()
         {
             Console.WriteLine("Gestão de Ficheiros da Escola");
