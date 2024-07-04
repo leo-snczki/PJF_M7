@@ -102,6 +102,60 @@ namespace PJF_M7
             else File.Create(files[2]);
         }
 
+        static void RemoveSubject()
+        {
+            if(alunos.Length > 0)
+            {
+                ListStudents();
+                Console.Write("Insira o estudante que quer remover a disciplina: ");
+                do 
+                {
+                    int.TryParse(Console.ReadLine(), out op);
+                    if (op < 1 || op - 1 >= alunos.Length) Console.Write("Opção inválida, tente novamente: ");
+                    else if (alunos[op - 1].materia.Length < 1) Console.Write("Esse estudante está em nunhuma disciplina, tente outro estudante: ");
+                } while (op < 1 || op - 1 >= alunos.Length || alunos[op - 1].materia.Length < 1);
+                op--;
+                Console.WriteLine($"Disciplinas que {alunos[op].nome} participa: ");
+                for (int i = 0; i < alunos[op].materia.Length; i++)
+                {
+                    Console.WriteLine($"{i + 1} - {alunos[op].materia[i].nome}");
+                }
+                Console.Write("Insira a disciplina que gostaria de remover" +
+                    "\nInsire nada se quiser cancelar: ");
+                do
+                {
+                    input = Console.ReadLine();
+                    if (int.Parse(input) < 1 || int.Parse(input) - 1 >= alunos[op].materia.Length) Console.Write("Valor inválido, tente novamente: ");
+                } while ((int.Parse(input) < 1 || int.Parse(input) - 1 >= alunos[op].materia.Length) && input != "");
+            }
+        }
+
+        static void AddSubject()
+        {
+            if(alunos.Length > 0)
+            {
+                ListStudents();
+                Console.Write("\nInsira o estudante que gostaria de adicionar uma disciplina: ");
+                do
+                {
+                    int.TryParse(Console.ReadLine(), out op);
+                    if (op < 1 || op - 1 >= alunos.Length) Console.Write("Valor inválido, tente novamente: ");
+                } while (op < 1 || op - 1 >= alunos.Length);
+                op--;
+                Console.Write($"Insira a disciplina que gostarida de adicionar a {alunos[op].nome}: ");
+                do
+                {
+                    input = Console.ReadLine();
+                    if (Array.FindIndex(alunos[op].materia, s => s.nome.ToLower() == input.ToLower()) != -1) Console.Write("Esse estudante já está nessa disciplina");
+                    if (input.Length < 2) Console.Write("O nome da disciplina não pode ser menor que 2 caracteres");
+                } while (Array.FindIndex(alunos[op].materia, s => s.nome.ToLower() == input.ToLower()) != -1 || input.Length < 2);
+                Array.Resize(ref alunos[op].materia, alunos[op].materia.Length + 1);
+                Array.Resize(ref alunos[op].faltas, alunos[op].faltas.Length + 1);
+                alunos[op].materia[alunos[op].materia.Length - 1] = new Disciplina { nome = input, nota = 0 };
+                alunos[op].faltas[alunos[op].faltas.Length - 1] = new Falta { disciplina = input, faltas = 0 };
+            }
+        }
+
         static void AddStudent()
         {
             Array.Resize(ref alunos, alunos.Length + 1);
@@ -110,7 +164,7 @@ namespace PJF_M7
             do
             {
                 input = Console.ReadLine();
-                if (input.Length < 2) Console.Write("O nome não pode ser menor de 3 caracteres: ");
+                if (input.Length < 2) Console.Write("O nome não pode ser menor que 3 caracteres: ");
             } while (input.Length < 2);
             alunos[alunos.Length - 1].nome = input;
 
@@ -139,15 +193,75 @@ namespace PJF_M7
         {
             if(alunos.Length > 0)
             {
+                bool check;
                 ListStudents();
                 Console.Write("Insira o estudante que gostaria de editar");
                 do
                 {
                     int.TryParse(Console.ReadLine(), out op);
-                    if (op <= -1 || op - 1 >= alunos.Length) Console.Write("Valor inválido tente novamente: ");
-                } while (op <= -1 || op - 1 >= alunos.Length);
+                    if (op < 1 || op - 1 >= alunos.Length) Console.Write("Valor inválido tente novamente: ");
+                } while (op < 1 || op - 1 >= alunos.Length);
+                op--;
 
-                Console.WriteLine("1 - Editar notas\n2 - Editar ");
+                Console.WriteLine("1 - Editar notas \n2 - Editar faltas \n3 - Editar Informações do estudante \n0 - Cancelar \n");
+                Console.Write("Escolha uma das opções acima: ");
+                do
+                {
+                    check = true;
+                    switch (Console.ReadLine())
+                    {
+                        case "1":
+                            for (int i = 0; i < alunos[op].materia.Length; i++)
+                            {
+                                Console.Write($"Insira a nova nota de {alunos[op].nome} " +
+                                    $"na disciplina {alunos[op].materia[i].nome}" +
+                                    $"\nO valor atual é {alunos[op].materia[i].nota}" +
+                                    $"\nInsire nada se não quiser alterar: ");
+                                do
+                                {
+                                    input = Console.ReadLine();
+                                    if ((double.Parse(input) < 0 || double.Parse(input) > 20) && input != "") Console.Write("Valor inválido, tente novamente: ");
+                                } while ((double.Parse(input) < 0 || double.Parse(input) > 20) && input != "");
+                                if(input != "") double.TryParse(input, out alunos[op].materia[i].nota);
+                            }
+                            break;
+                        case "2":
+                            for(int i = 0; i < alunos[op].faltas.Length; i++)
+                            {
+                                Console.Write($"Insira o número de faltas de {alunos[op].nome} " +
+                                    $"na disciplina {alunos[op].faltas[i].disciplina}" +
+                                    $"\nO número de faltas atual é {alunos[op].faltas[i].faltas}" +
+                                    $"\nInsire nada se não quiser alterar: ");
+                                do
+                                {
+                                    input = Console.ReadLine();
+                                    if (int.Parse(input) < 0 && input != "") Console.Write("Valor inválido, tente novamente: ");
+                                } while (int.Parse(input) < 0 && input != "");
+                                if(input != "")int.TryParse(input, out alunos[op].faltas[i].faltas);
+                            }
+                            break;
+                        case "3":
+                            Console.Write($"Insira o novo nome de {alunos[op].nome}" +
+                                $"\nInsire nada se não quiser alterar: ");
+                            do
+                            {
+                                input = Console.ReadLine();
+                                if (input.Length < 2 && input != "") Console.Write("O novo nome não pode ser menor que 3 caracteres: ");
+                            } while (input.Length < 2 && input != "");
+                            Console.Write($"Insira a nova turma, a atual é {alunos[op].turma}" +
+                                $"\nInsire nada se não quiser alterar: ");
+                            input = Console.ReadLine();
+                            if (input != "") alunos[op].turma = input;
+                            break;
+                        case "0":
+                            Console.Write("Saindo...");
+                            break;
+                        default:
+                            check = false;
+                            Console.Write("Opção inválida, tente novamente: ");
+                            break;
+                    }
+                } while (!check);
             }
             else Console.WriteLine("Não existem estudantes salvos");
         }
@@ -164,7 +278,8 @@ namespace PJF_M7
                     if (op <= -1 || op - 1 >= alunos.Length) Console.Write("Valor inválido tente novamente: ");
                 } while (op <= -1 || op - 1 >= alunos.Length);
 
-                Console.WriteLine($"Tem mesmo a certeza que quer remover {alunos[op - 1].nome}? \nInsire '1' se quiser continuar \nQualquer outro valor cancelerá a operação");
+                Console.WriteLine($"Tem mesmo a certeza que quer remover {alunos[op - 1].nome}?" +
+                    $"\nInsire '1' se quiser continuar \nQualquer outro valor cancelerá a operação");
                 
                 input = Console.ReadLine();
 
