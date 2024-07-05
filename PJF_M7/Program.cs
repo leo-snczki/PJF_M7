@@ -19,6 +19,19 @@ namespace PJF_M7
                 set { passwd = value; }
             }
         }
+
+                    struct Account
+        {
+            public string user;
+            public string passwd;
+
+            public Account(string nameUser, string password)
+            {
+                user = nameUser;
+                passwd = password;
+            }
+        }
+                    static string[] files = { "nomes.txt", "notas.txt", "faltas.txt", "login.txt" };
     class Program
     {
         static public string currentDirectory = Directory.GetCurrentDirectory();
@@ -37,6 +50,66 @@ namespace PJF_M7
             Teacher.User = "professor";
             Teacher.Passwd = "123";
 
+        }
+
+                       static void LoadUsers()
+        {
+            if (File.Exists(files[3]))
+            {
+                var linhas = File.ReadAllLines(files[3]);
+                foreach (var linha in linhas)
+                {
+                    var dados = linha.Split(';');
+                    if (dados.Length == 2)
+                    {
+                        logins.Add(new Account(dados[0], dados[1]));
+                    }
+                }
+            }
+        }
+        static void CreateUser()
+        {
+            Account anuser;
+            string checkpasswd;
+
+            Console.Write("Insira o nome do novo utilizador: ");
+            anuser.user = Console.ReadLine();
+            
+                Console.Write("Insira a senha do novo utilzador: ");
+                anuser.passwd = Console.ReadLine();
+                Console.Write("Confirme sua senha: ");
+                checkpasswd = Console.ReadLine();
+
+            if (!File.Exists(files[3])) File.Create(files[3]).Close();
+
+            if (LinesCheck(files[3]))
+            {
+                using (StreamWriter sw = new StreamWriter(files[3],true))
+                {
+                    sw.WriteLine($"{anuser.user};{anuser.passwd}");
+                }
+            }
+            else
+            {
+                using (StreamWriter sw = new StreamWriter(files[3]))
+                {
+                    sw.WriteLine($"{anuser.user};{anuser.passwd}");
+                }              
+            }
+            Console.WriteLine("Usuário registrado com sucesso!");
+        }
+
+        static bool LinesCheck(string path)
+        {
+            if (File.Exists(path))
+            {
+                using (var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (StreamReader sr = new StreamReader(fileStream))
+                {
+                    return sr.ReadLine() != null;
+                }
+            }
+            return false;
         }
         
         static void ShowDefaultMenu()
