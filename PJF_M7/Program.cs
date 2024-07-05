@@ -31,7 +31,7 @@ namespace PJF_M7
 
         static int op;
 
-        static string[] subjects;
+        static string[] subjects = new string[0];
 
         static readonly string[] files = { "nomes.txt", "notas.txt", "faltas.txt" };
 
@@ -57,7 +57,7 @@ namespace PJF_M7
                     int.TryParse(File.ReadAllLines(files[0])[i + 2], out alunos[i].numero);
                 }
             }
-            else File.Create(files[0]);
+            else File.Create(files[0]).Close();
 
             if (File.Exists(files[1]) || File.Exists(files[1] + ".bak"))
             {
@@ -82,7 +82,7 @@ namespace PJF_M7
                     }
                 }
             }
-            else File.Create(files[1]);
+            else File.Create(files[1]).Close();
 
             if (File.Exists(files[2]) || File.Exists(files[2] + ".bak") )
             {
@@ -107,7 +107,7 @@ namespace PJF_M7
                     }
                 }
             }
-            else File.Create(files[2]);
+            else File.Create(files[2]).Close();
 
             ChooseOption();
         }
@@ -258,9 +258,7 @@ namespace PJF_M7
                 string extra = "";
                 for (int i = 0; i < alunos.Length; i++)
                 {
-                    try
-                    {
-                        if(alunos[i].materia.Length > 0)
+                    if (alunos[i].materia.Length > 0)
                         for (int j = 0; j < alunos[i].materia.Length; i++)
                         {
                             if (Array.FindIndex(subjects, s => s == alunos[i].materia[j].nome) == -1)
@@ -269,8 +267,6 @@ namespace PJF_M7
                                 subjects[subjects.Length - 1] = alunos[i].materia[j].nome;
                             }
                         }
-                    }
-                    catch (Exception ex) { break; }
                 }
                 do
                 {
@@ -278,14 +274,14 @@ namespace PJF_M7
                     switch (Console.ReadLine())
                     {
                         case "1":
-                            if (!File.Exists(pathGrades + ".txt")) File.Create(pathGrades + ".txt");
+                            if (!File.Exists(pathGrades + ".txt")) File.Create(pathGrades + ".txt").Close();
                             else
                             {
                                 for (int i = 2; File.Exists(pathGrades + extra + ".txt"); i++)
                                 {
                                     extra = $" ({i})";
                                 }
-                                File.Create(pathGrades + extra + ".txt");
+                                File.Create(pathGrades + extra + ".txt").Close();
                             }
                             using (StreamWriter writer = new StreamWriter(pathGrades + extra + ".txt"))
                             {
@@ -304,14 +300,14 @@ namespace PJF_M7
                             }
                             break;
                         case "2":
-                            if (!File.Exists(pathAbsences + ".txt")) File.Create(pathAbsences + ".txt");
+                            if (!File.Exists(pathAbsences + ".txt")) File.Create(pathAbsences + ".txt").Close();
                             else
                             {
                                 for (int i = 2; File.Exists(pathAbsences + extra + ".txt"); i++)
                                 {
                                     extra = $" ({i})";
                                 }
-                                File.Create(pathAbsences + extra + ".txt");
+                                File.Create(pathAbsences + extra + ".txt").Close();
                             }
 
                             using (StreamWriter writer = new StreamWriter(pathAbsences + extra + ".txt"))
@@ -367,6 +363,10 @@ namespace PJF_M7
                 alunos[alunos.Length - 1].turma = input;
 
                 alunos[alunos.Length - 1].numero = alunos.Max(s => s.numero) + 1;
+
+                alunos[alunos.Length - 1].materia = new Disciplina[0];
+
+                alunos[alunos.Length - 1].faltas = new Falta[0];
 
                 Array.Sort(alunos, (x, y) => x.nome.CompareTo(y.nome));
             }
@@ -502,7 +502,7 @@ namespace PJF_M7
                         );
                 }
             }
-            catch (Exception ex) { }
+            catch { }
 
             foreach (var file in files)
             {
@@ -525,7 +525,7 @@ namespace PJF_M7
                         $"\nÚltimo acesso - {info.LastAccessTime:ddd dd-MM-yyyy HH:mm}"
                         );
                 }
-                catch (Exception ex) { }
+                catch { }
             }
         }
 
