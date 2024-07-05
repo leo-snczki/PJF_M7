@@ -73,12 +73,12 @@ namespace PJF_M7
                 {
                     int k = 0;
 
-                    alunos[i].materia = new Disciplina[0];
-
                     string[] sublines = lines[i].Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                     
                     if (sublines.Length > 0)
                     {
+                        alunos[i].materia = new Disciplina[0];
+                        
                         Array.Resize(ref alunos[i].materia, sublines.Length / 2);
 
                         for (int j = 0; j < sublines.Length; j += 2)
@@ -100,12 +100,12 @@ namespace PJF_M7
                 {
                     int k = 0;
 
-                    alunos[i].faltas = new Falta[0];
-
                     string[] sublines = lines[i].Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
                     if (sublines.Length > 0)
                     {
+                        alunos[i].faltas = new Falta[0];
+
                         Array.Resize(ref alunos[i].faltas, sublines.Length / 2);
 
                         for (int j = 0; j < sublines.Length; j += 2)
