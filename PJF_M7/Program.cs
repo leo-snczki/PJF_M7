@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.IO;
 
@@ -27,13 +27,37 @@ namespace PJF_M7
             public Falta[] faltas;
         }
 
+        struct UserAccount
+        {
+            private string user;
+            private string passwd;
+
+            public string User
+            {
+                get { return user; }
+                set { user = value; }
+            }
+
+            public string Passwd
+            {
+                get { return passwd; }
+                set { passwd = value; }
+            }
+
+            public UserAccount(string nameUser, string password)
+            {
+                user = nameUser;
+                passwd = password;
+            }
+        }
+
         static string input, output = "Info Estudantes";
 
         static int op;
 
         static string[] subjects = new string[0];
 
-        static readonly string[] files = { "nomes.txt", "notas.txt", "faltas.txt" };
+        static readonly string[] files = { "nomes.txt", "notas.txt", "faltas.txt", "loginprofessores.txt" };
 
         static string[] lines;
 
@@ -42,6 +66,198 @@ namespace PJF_M7
         static void Main(string[] args)
         {
             Initializer();
+        }
+
+        static void LoadUsers()
+        {
+            if (File.Exists(files[3]))
+            {
+                var lines = File.ReadAllLines(files[3]);
+                foreach (var line in lines)
+                {
+                    var data = line.Split(';');
+                    if (data.Length == 2)
+                    {
+                        UserAccount user = new UserAccount(data[0], data[1]);
+                    }
+                }
+            }
+        }
+        static void CreateUser()
+        {
+            UserAccount newUser;
+
+            Console.Clear();
+            Console.Write("(Digite 0 para sair) Insira o nome de utilizador: ");
+            string username = Console.ReadLine();
+
+            if (username == "0")
+            {
+                LoginScreen();
+            }
+
+            Console.Write("(Digite 0 para sair) Insira uma senha: ");
+            string password = Console.ReadLine();
+
+            if (password == "0")
+            {
+                LoginScreen();
+            }
+
+            Console.Write("(Digite 0 para sair) Confirme a senha: ");
+            string confirmPassword = Console.ReadLine();
+
+            if (confirmPassword == "0")
+            {
+                LoginScreen();
+            }
+
+            while (confirmPassword != password)
+            {
+                Console.WriteLine("As senhas não coincidem. Tente novamente.");
+
+                Console.Write($"Insira a senha de {username}: ");
+                password = Console.ReadLine();
+
+                Console.Write("Confirme a senha: ");
+                confirmPassword = Console.ReadLine();
+            }
+
+            if (UserExists(username) == true)
+            {
+                Console.WriteLine("Este utilizador já existe");
+                Console.WriteLine("Pressione qualquer tecla para voltar ao menu de login...");
+                Console.ReadKey();
+                LoginScreen();
+            }
+            else
+            {
+
+                if (!File.Exists(files[3]))
+                {
+                    File.Create(files[3]).Close();
+                }
+
+                newUser = new UserAccount(username, password);
+
+
+                using (StreamWriter sw = new StreamWriter(files[3], true))
+                {
+                    sw.WriteLine($"{newUser.User};{newUser.Passwd}");
+                }
+
+                Console.WriteLine("Utilizador registado com sucesso!");
+                Console.WriteLine("Pressione qualquer tecla para voltar ao menu... ");
+                Console.ReadKey();
+                LoginScreen();
+
+            }
+
+        }
+
+        static bool UserExists(string username)
+        {
+            if (File.Exists(files[3]))
+            {
+                var lines = File.ReadAllLines(files[3]);
+                foreach (var line in lines)
+                {
+                    var data = line.Split(';');
+                    if (data.Length == 2 && data[0].Equals(username, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        static void LoginScreen()
+        {
+            Console.Clear();
+            LoadUsers();
+            LoginMenu();
+            Console.Write("Insira a opção: ");
+            input = Console.ReadLine();
+            switch (input)
+            {
+
+                case "1":
+                    StartLogin();
+                    break;
+                case "2":
+                    CreateUser();
+                    break;
+                case "0":
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Opção inválida");
+                    LoginScreen();
+                    break;
+            }
+        }
+        static void StartLogin()
+        {
+            string username;
+            string password;
+
+            Console.Clear();
+            Console.Write("(Digite 0 para sair) insira o nome de utilizador: ");
+            username = Console.ReadLine();
+            if (username == "0")
+            {
+                LoginScreen();
+            }
+
+            Console.Write($"(Digite 0 para sair) Insira a senha de {username}: ");
+            password = Console.ReadLine();
+
+            if (password == "0")
+            {
+                LoginScreen();
+            }
+
+            if (VerifyLogin(username, password))
+            {
+                Console.WriteLine($"\n bem vindo/a {username}!\n");
+            }
+            else
+            {
+                Console.WriteLine("\nCredenciais inválidas\n");
+                Console.ReadKey();
+                Console.Clear();
+                StartLogin();
+            }
+        }
+
+        static bool VerifyLogin(string username, string password)
+        {
+            if (File.Exists(files[3]))
+            {
+                var lines = File.ReadAllLines(files[3]);
+                foreach (var line in lines)
+                {
+                    var data = line.Split(';');
+                    if (data.Length == 2 && data[0].Equals(username, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Verifica a senha correspondente
+                        if (data[1] == password)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+
+        }
+
+        static void LoginMenu()
+        {
+            Console.WriteLine("1. Logar" +
+                "\n2. Registar" +
+                "\n0. Sair");
         }
 
         static void Initializer()
@@ -118,7 +334,7 @@ namespace PJF_M7
                 }
             }
             else File.Create(files[2]).Close();
-
+            LoginScreen();
             ChooseOption();
         }
 
