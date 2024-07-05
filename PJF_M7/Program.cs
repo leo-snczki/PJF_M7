@@ -48,36 +48,44 @@ namespace PJF_M7
         {
             if (File.Exists(files[0]) || File.Exists(files[0] + ".bak")) 
             {
-                if (!File.Exists(files[0]) && File.Exists(files[0] + ".bak")) File.Copy(files[0] + ".bak", files[0]);
-                Array.Resize(ref alunos, File.ReadAllLines(files[0]).Length);
-                for(int i = 0; i < alunos.Length; i += 3)
+                if (!File.Exists(files[0]) && File.Exists(files[0] + ".bak")) File.Copy(files[0] + ".bak", files[0], true);
+                lines = File.ReadAllLines(files[0]);
+                Array.Resize(ref alunos, lines.Length / 3);
+                int i = 0;
+                for (int j = 0; j < lines.Length; j += 3)
                 {
-                    alunos[i].nome = File.ReadAllLines(files[0])[i];
-                    alunos[i].turma = File.ReadAllLines(files[0])[i + 1];
-                    int.TryParse(File.ReadAllLines(files[0])[i + 2], out alunos[i].numero);
+                    alunos[i].nome = File.ReadAllLines(files[0])[j];
+                    alunos[i].turma = File.ReadAllLines(files[0])[j + 1];
+                    int.TryParse(File.ReadAllLines(files[0])[j + 2], out alunos[i].numero);
+                    alunos[i].materia = new Disciplina[0];
+                    alunos[i].faltas = new Falta[0];
+                    i++;
                 }
             }
             else File.Create(files[0]).Close();
 
             if (File.Exists(files[1]) || File.Exists(files[1] + ".bak"))
             {
-                if (!File.Exists(files[1]) && File.Exists(files[1] + ".bak")) File.Copy(files[1] + ".bak", files[1]);
+                if (!File.Exists(files[1]) && File.Exists(files[1] + ".bak")) File.Copy(files[1] + ".bak", files[1], true);
                 lines = File.ReadAllText(files[1]).Split(new char[] { 'b' }, StringSplitOptions.None);
+
                 for (int i = 0; i < lines.Length; i++)
                 {
+                    int k = 0;
+
+                    alunos[i].materia = new Disciplina[0];
+
                     string[] sublines = lines[i].Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                     
                     if (sublines.Length > 0)
                     {
                         Array.Resize(ref alunos[i].materia, sublines.Length / 2);
 
-                        for (int j = 0; j < sublines.Length; j++)
+                        for (int j = 0; j < sublines.Length; j += 2)
                         {
-                            for (int k = 0; k < alunos[i].materia.Length; k++)
-                            {
-                                if (j == 0 || j % 2 == 0) alunos[i].materia[k].nome = sublines[j];
-                                else double.TryParse(sublines[j], out alunos[i].materia[k].nota);
-                            }
+                            alunos[i].materia[k].nome = sublines[j];
+                            double.TryParse(sublines[j + 1], out alunos[i].materia[k].nota);
+                            k++;
                         }
                     }
                 }
@@ -86,23 +94,25 @@ namespace PJF_M7
 
             if (File.Exists(files[2]) || File.Exists(files[2] + ".bak") )
             {
-                if (!File.Exists(files[2]) && File.Exists(files[2] + ".bak")) File.Copy(files[2] + ".bak", files[2]);
+                if (!File.Exists(files[2]) && File.Exists(files[2] + ".bak")) File.Copy(files[2] + ".bak", files[2], true);
                 lines = File.ReadAllText(files[2]).Split(new char[] { 'b' }, StringSplitOptions.None);
                 for (int i = 0; i < lines.Length; i++)
                 {
+                    int k = 0;
+
+                    alunos[i].faltas = new Falta[0];
+
                     string[] sublines = lines[i].Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
                     if (sublines.Length > 0)
                     {
                         Array.Resize(ref alunos[i].faltas, sublines.Length / 2);
 
-                        for (int j = 0; j < sublines.Length; j++)
+                        for (int j = 0; j < sublines.Length; j += 2)
                         {
-                            for (int k = 0; k < alunos[i].faltas.Length; k++)
-                            {
-                                if (j == 0 || j % 2 == 0) alunos[i].faltas[k].disciplina = sublines[j];
-                                else int.TryParse(sublines[j], out alunos[i].faltas[k].faltas);
-                            }
+                            alunos[i].faltas[k].disciplina = sublines[j];
+                            int.TryParse(sublines[j + 1], out alunos[i].faltas[k].faltas);
+                            k++;
                         }
                     }
                 }
@@ -213,7 +223,9 @@ namespace PJF_M7
                 }
                 else Console.WriteLine("Não existem disciplinas registradas neste aluno\n");
             }
-            else Console.WriteLine("Não existem alunos registrados\n");
+            else Console.WriteLine("Não existem alunos registrados");
+
+            Console.WriteLine("\n");
         }
 
         static void AddSubject()
@@ -221,26 +233,33 @@ namespace PJF_M7
             if(alunos.Length > 0)
             {
                 ListStudents();
-                Console.Write("\nInsira o estudante que gostaria de adicionar uma disciplina: ");
-                do
-                {
-                    int.TryParse(Console.ReadLine(), out op);
-                    if (op < 1 || op - 1 >= alunos.Length) Console.Write("Valor inválido, tente novamente: ");
-                } while (op < 1 || op - 1 >= alunos.Length);
-                op--;
-                Console.Write($"Insira a disciplina que gostarida de adicionar a {alunos[op].nome}: ");
+                Console.Write("\nInsira o estudante que gostaria de adicionar uma disciplina" +
+                    "\nInsire nada para cancelar: ");
                 do
                 {
                     input = Console.ReadLine();
-                    if (Array.FindIndex(alunos[op].materia, s => s.nome.ToLower() == input.ToLower()) != -1) Console.Write("Esse estudante já está nessa disciplina: ");
-                    if (input.Length < 2) Console.Write("O nome da disciplina não pode ser menor que 2 caracteres: ");
-                } while (Array.FindIndex(alunos[op].materia, s => s.nome.ToLower() == input.ToLower()) != -1 || input.Length < 2);
-                Array.Resize(ref alunos[op].materia, alunos[op].materia.Length + 1);
-                Array.Resize(ref alunos[op].faltas, alunos[op].faltas.Length + 1);
-                alunos[op].materia[alunos[op].materia.Length - 1] = new Disciplina { nome = input, nota = 0 };
-                alunos[op].faltas[alunos[op].faltas.Length - 1] = new Falta { disciplina = input, faltas = 0 };
+                    int.TryParse(input, out op);
+                    if ((op < 1 || op - 1 >= alunos.Length) && input != "") Console.Write("Valor inválido, tente novamente: ");
+                } while ((op < 1 || op - 1 >= alunos.Length) && input != "");
+                if (input != "")
+                {
+                    op--;
+                    Console.Write($"Insira a disciplina que gostarida de adicionar a {alunos[op].nome}: ");
+                    do
+                    {
+                        input = Console.ReadLine().ToLower();
+                        if (Array.FindIndex(alunos[op].materia, s => s.nome.ToLower() == input.ToLower()) != -1) Console.Write("Esse estudante já está nessa disciplina: ");
+                        if (input.Length < 2) Console.Write("O nome da disciplina não pode ser menor que 2 caracteres: ");
+                    } while (Array.FindIndex(alunos[op].materia, s => s.nome.ToLower() == input.ToLower()) != -1 || input.Length < 2);
+                    Array.Resize(ref alunos[op].materia, alunos[op].materia.Length + 1);
+                    Array.Resize(ref alunos[op].faltas, alunos[op].faltas.Length + 1);
+                    alunos[op].materia[alunos[op].materia.Length - 1] = new Disciplina { nome = input, nota = 0 };
+                    alunos[op].faltas[alunos[op].faltas.Length - 1] = new Falta { disciplina = input, faltas = 0 };
+                }
             }
-            else Console.WriteLine("Não existem alunos registrados\n");
+            else Console.WriteLine("Não existem alunos registrados");
+
+            Console.WriteLine("\n");
         }
 
         static void OutputInfo()
@@ -252,16 +271,16 @@ namespace PJF_M7
                     "\n2 - Listar todas as faltas de todos os alunos em todas as disciplinas" +
                     "\n0 - Cancela a execução");
                 Console.Write("\nEscolha uma das opções a cima: ");
-                if (!Directory.Exists(Path.Combine(Environment.SpecialFolder.Desktop.ToString(), output))) Directory.CreateDirectory(Path.Combine(Environment.SpecialFolder.Desktop.ToString(), output));
-                string pathGrades = Path.Combine(new string[] { Environment.SpecialFolder.Desktop.ToString(), output, $"Notas - {DateTime.Now:dd-MM-yyyy}" });
-                string pathAbsences = Path.Combine(new string[] { Environment.SpecialFolder.Desktop.ToString(), output, $"Faltas - {DateTime.Now:dd-MM-yyyy}" });
+                if (!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), output))) Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), output));
+                string pathGrades = Path.Combine(new string[] { Environment.GetFolderPath(Environment.SpecialFolder.Desktop), output, $"Notas - {DateTime.Now:dd-MM-yyyy}" });
+                string pathAbsences = Path.Combine(new string[] { Environment.GetFolderPath(Environment.SpecialFolder.Desktop), output, $"Faltas - {DateTime.Now:dd-MM-yyyy}" });
                 string extra = "";
                 for (int i = 0; i < alunos.Length; i++)
                 {
                     if (alunos[i].materia.Length > 0)
-                        for (int j = 0; j < alunos[i].materia.Length; i++)
+                        for (int j = 0; j < alunos[i].materia.Length; j++)
                         {
-                            if (Array.FindIndex(subjects, s => s == alunos[i].materia[j].nome) == -1)
+                            if (Array.FindIndex(subjects, s => s.ToLower() == alunos[i].materia[j].nome.ToLower()) == -1)
                             {
                                 Array.Resize(ref subjects, subjects.Length + 1);
                                 subjects[subjects.Length - 1] = alunos[i].materia[j].nome;
@@ -274,57 +293,68 @@ namespace PJF_M7
                     switch (Console.ReadLine())
                     {
                         case "1":
-                            if (!File.Exists(pathGrades + ".txt")) File.Create(pathGrades + ".txt").Close();
-                            else
+                            if (subjects.Length > 0)
                             {
-                                for (int i = 2; File.Exists(pathGrades + extra + ".txt"); i++)
+                                if (!File.Exists(pathGrades + ".txt")) File.Create(pathGrades + ".txt").Close();
+                                else
                                 {
-                                    extra = $" ({i})";
-                                }
-                                File.Create(pathGrades + extra + ".txt").Close();
-                            }
-                            using (StreamWriter writer = new StreamWriter(pathGrades + extra + ".txt"))
-                            {
-                                for (int i = 0; i < subjects.Length; i++)
-                                {
-                                    writer.WriteLine(subjects[i] + "\n");
-                                    for (int j = 0; j < alunos.Length; j++)
+                                    for (int i = 2; File.Exists(pathGrades + extra + ".txt"); i++)
                                     {
-                                        op = Array.FindIndex(alunos[j].materia, s => s.nome.ToLower() == subjects[i].ToLower());
-                                        writer.WriteLine($"{alunos[j].nome} - {alunos[j].turma} - {((op == -1) ? "N/A" : alunos[j].materia[op].nota.ToString() + " Valor(es)")}");
+                                        extra = $" ({i})";
                                     }
-                                    writer.WriteLine();
+                                    File.Create(pathGrades + extra + ".txt").Close();
                                 }
-                                writer.WriteLine("N/A - o aluno não participa da disciplina");
-                                writer.Close();
+
+                                using (StreamWriter writer = new StreamWriter(pathGrades + extra + ".txt"))
+                                {
+                                    for (int i = 0; i < subjects.Length; i++)
+                                    {
+                                        writer.WriteLine(subjects[i] + "\n");
+                                        for (int j = 0; j < alunos.Length; j++)
+                                        {
+                                            op = Array.FindIndex(alunos[j].materia, s => s.nome.ToLower() == subjects[i].ToLower());
+                                            writer.WriteLine($"{alunos[j].nome} - {alunos[j].turma} - {((op == -1) ? "N/A" : alunos[j].materia[op].nota.ToString() + " Valor(es)")}");
+                                        }
+                                        writer.WriteLine();
+                                    }
+                                    writer.WriteLine("N/A - o aluno não participa da disciplina");
+
+                                    writer.Close();
+                                }
                             }
+                            else Console.WriteLine("Não existem registros de disciplinas");
                             break;
                         case "2":
-                            if (!File.Exists(pathAbsences + ".txt")) File.Create(pathAbsences + ".txt").Close();
-                            else
+                            if (subjects.Length > 0)
                             {
-                                for (int i = 2; File.Exists(pathAbsences + extra + ".txt"); i++)
+                                if (!File.Exists(pathAbsences + ".txt")) File.Create(pathAbsences + ".txt").Close();
+                                else
                                 {
-                                    extra = $" ({i})";
-                                }
-                                File.Create(pathAbsences + extra + ".txt").Close();
-                            }
-
-                            using (StreamWriter writer = new StreamWriter(pathAbsences + extra + ".txt"))
-                            {
-                                for (int i = 0; i < subjects.Length; i++)
-                                {
-                                    writer.Write(subjects[i] + "\n");
-                                    for (int j = 0; j < alunos.Length; j++)
+                                    for (int i = 2; File.Exists(pathAbsences + extra + ".txt"); i++)
                                     {
-                                        op = Array.FindIndex(alunos[j].faltas, s => s.disciplina.ToLower() == subjects[i].ToLower());
-                                        writer.WriteLine($"{alunos[j].nome} - {alunos[j].turma} - {((op == -1) ? "N/A" : alunos[j].faltas[op].faltas.ToString() + " falta(s)")}");
+                                        extra = $" ({i})";
                                     }
-                                    writer.WriteLine();
+                                    File.Create(pathAbsences + extra + ".txt").Close();
                                 }
-                                writer.WriteLine("N/A - o aluno não participa da disciplina");
-                                writer.Close();
+
+                                using (StreamWriter writer = new StreamWriter(pathAbsences + extra + ".txt"))
+                                {
+                                    for (int i = 0; i < subjects.Length; i++)
+                                    {
+                                        writer.Write(subjects[i] + "\n");
+                                        for (int j = 0; j < alunos.Length; j++)
+                                        {
+                                            op = Array.FindIndex(alunos[j].faltas, s => s.disciplina.ToLower() == subjects[i].ToLower());
+                                            writer.WriteLine($"{alunos[j].nome} - {alunos[j].turma} - {((op == -1) ? "N/A" : alunos[j].faltas[op].faltas.ToString() + " falta(s)")}");
+                                        }
+                                        writer.WriteLine();
+                                    }
+                                    writer.WriteLine("N/A - o aluno não participa da disciplina");
+
+                                    writer.Close();
+                                }
                             }
+                            else Console.WriteLine("Não existem registros de faltas em todas as disciplinas");
                             break;
                         case "0":
                             break;
@@ -336,7 +366,9 @@ namespace PJF_M7
                 } while (!check);
                 Array.Resize(ref subjects, 0);
             }
-            else Console.WriteLine("Não existem alunos registrados\n");
+            else Console.WriteLine("Não existem alunos registrados");
+
+            Console.WriteLine("\n");
         }
 
         static void AddStudent()
@@ -348,9 +380,10 @@ namespace PJF_M7
             {
                 input = Console.ReadLine();
                 if (input.Length < 3 && input != "") Console.Write("O nome não pode ser menor que 3 caracteres: ");
-            } while (input.Length < 3 && input != "");
-            if(input != "") 
-            { 
+                if (Array.FindIndex(alunos, s => s.nome == input) != -1 && input != "") Console.Write("Já existe um aluno com esse nome: ");
+            } while ((input.Length < 3 || Array.FindIndex(alunos, s => s.nome.ToLower() == input.ToLower()) != -1) && input != "");
+            if (input != "")
+            {
                 Array.Resize(ref alunos, alunos.Length + 1);
                 alunos[alunos.Length - 1].nome = input;
 
@@ -370,6 +403,8 @@ namespace PJF_M7
 
                 Array.Sort(alunos, (x, y) => x.nome.CompareTo(y.nome));
             }
+
+            Console.WriteLine("\n");
         }
 
         static void ListStudents()
@@ -442,13 +477,14 @@ namespace PJF_M7
                                 input = Console.ReadLine();
                                 if (input.Length < 2 && input != "") Console.Write("O novo nome não pode ser menor que 3 caracteres: ");
                             } while (input.Length < 2 && input != "");
+                            if (input != "") alunos[op].nome = input;
                             Console.Write($"Insira a nova turma, a atual é {alunos[op].turma}" +
                                 $"\nInsire nada se não quiser alterar: ");
                             input = Console.ReadLine();
                             if (input != "") alunos[op].turma = input;
                             break;
                         case "0":
-                            Console.Write("Saindo...");
+                            Console.WriteLine("Saindo...");
                             break;
                         default:
                             check = false;
@@ -457,7 +493,9 @@ namespace PJF_M7
                     }
                 } while (!check);
             }
-            else Console.WriteLine("Não existem alunos registrados\n");
+            else Console.WriteLine("Não existem alunos registrados");
+
+            Console.WriteLine("\n");
         }
 
         static void RemoveStudent()
@@ -484,7 +522,9 @@ namespace PJF_M7
                     Array.Resize(ref alunos, alunos.Length - 1);
                 }
             }
-            else Console.WriteLine("Não existem alunos registrados\n");
+            else Console.WriteLine("Não existem alunos registrados");
+
+            Console.WriteLine("\n");
         }
 
         static void FilesInfo()
@@ -498,7 +538,7 @@ namespace PJF_M7
                     Console.WriteLine(
                         $"\nNome - {info.Name}" +
                         $"\nTamanho - {info.Length} Bytes" +
-                        $"\nData de criação - {info.CreationTime:ddd dd-MM-yyyy HH:mm}"
+                        $"\nData de criação - {info.CreationTime:dddd dd-MM-yyyy HH:mm}"
                         );
                 }
             }
@@ -510,9 +550,9 @@ namespace PJF_M7
                 Console.WriteLine( 
                     $"\nNome - {info.Name}" +
                     $"\nTamanho - {info.Length} Bytes" +
-                    $"\nData de criação - {info.CreationTime:ddd dd-MM-yyyy HH:mm}" +
-                    $"\nÚltima modificação - {info.LastWriteTime:ddd dd-MM-yyyy HH:mm}" +
-                    $"\nÚltimo acesso - {info.LastAccessTime:ddd dd-MM-yyyy HH:mm}"
+                    $"\nData de criação - {info.CreationTime:dddd dd-MM-yyyy HH:mm}" +
+                    $"\nÚltima modificação - {info.LastWriteTime:dddd dd-MM-yyyy HH:mm}" +
+                    $"\nÚltimo acesso - {info.LastAccessTime:dddd dd-MM-yyyy HH:mm}"
                     );
                 try
                 {
@@ -520,21 +560,24 @@ namespace PJF_M7
                     Console.WriteLine(
                         $"\nNome - {info.Name}" +
                         $"\nTamanho - {info.Length} Bytes" +
-                        $"\nData de criação - {info.CreationTime:ddd dd-MM-yyyy HH:mm}" +
-                        $"\nÚltima modificação - {info.LastWriteTime:ddd dd-MM-yyyy HH:mm}" +
-                        $"\nÚltimo acesso - {info.LastAccessTime:ddd dd-MM-yyyy HH:mm}"
+                        $"\nData de criação - {info.CreationTime:dddd dd-MM-yyyy HH:mm}" +
+                        $"\nÚltima modificação - {info.LastWriteTime:dddd dd-MM-yyyy HH:mm}" +
+                        $"\nÚltimo acesso - {info.LastAccessTime:dddd dd-MM-yyyy HH:mm}"
                         );
                 }
                 catch { }
             }
+            Console.WriteLine("\n");
         }
 
         static void Saver()
         {
-            using(StreamWriter writer = new StreamWriter(files[0]))
+            for (int i = 0; i < files.Length; i++)
             {
-                if (File.Exists(files[0] + ".bak")) File.Delete(files[0] + ".bak");
-                File.Copy(files[0], files[0] + ".bak");
+                File.Copy(files[i], files[i] + ".bak", true);
+            }
+            using (StreamWriter writer = new StreamWriter(files[0]))
+            {
                 for(int i = 0; i < alunos.Length; i++)
                 {
                     writer.WriteLine(alunos[i].nome);
@@ -546,8 +589,6 @@ namespace PJF_M7
 
             using(StreamWriter writer = new StreamWriter(files[1]))
             {
-                if (File.Exists(files[1] + ".bak")) File.Delete(files[1] + ".bak");
-                File.Copy(files[1], files[1] + ".bak");
                 for (int i = 0; i < alunos.Length; i++)
                 {
                     for(int j = 0; j < alunos[i].materia.Length; j++)
@@ -561,9 +602,6 @@ namespace PJF_M7
 
             using (StreamWriter writer = new StreamWriter(files[2]))
             {
-                if (File.Exists(files[2] + ".bak")) File.Delete(files[2] + ".bak");
-                File.Copy(files[2], files[2] + ".bak");
-
                 for (int i = 0; i < alunos.Length; i++)
                 {
                     for (int j = 0; j < alunos[i].faltas.Length; j++)
