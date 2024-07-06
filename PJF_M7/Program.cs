@@ -8,257 +8,242 @@ namespace PJF_M7
     {
         struct Falta
         {
-            public string disciplina;
-            public int faltas;
+            public string disciplina; // Membro que armazena o nome da disciplina.
+            public int faltas; // Membro que armazena o número de faltas.
         }
 
         struct Disciplina
         {
-            public string nome;
-            public double nota;
+            public string nome; // Membro que armazena o nome da disciplina.
+            public double nota; // Membro que armazena a nota da disciplina.
         }
 
         struct Aluno
         {
-            public string nome;
-            public string turma;
-            public int numero;
-            public Disciplina[] materia;
-            public Falta[] faltas;
+            public string nome; // Membro que armazena o nome do aluno.
+            public string turma; // Membro que armazena a turma do aluno.
+            public int numero; // Membro que armazena o número do aluno.
+            public Disciplina[] materia; // Membro que armazena um array de objetos Disciplina.
+            public Falta[] faltas; // Membro que armazena um array de objetos Falta.
         }
+
 
         struct UserAccount
         {
-            private string user;
-            private string passwd;
+            private string user; // Membro privado do tipo string armazenar o nome de utilizador.
+            private string passwd; // Membro privado do tipo string para armazenar a senha do utilizador.
 
             public string User
             {
-                get { return user; }
-                set { user = value; }
+                get { return user; } // Propriedade para obter o nome de utilizador.
+                set { user = value; } // Propriedade para definir o nome de utilizador.
             }
 
             public string Passwd
             {
-                get { return passwd; }
-                set { passwd = value; }
+                get { return passwd; } // Propriedade para obter a senha do utilizador.
+                set { passwd = value; } // Propriedade para definir a senha do utilizador.
             }
 
             public UserAccount(string nameUser, string password)
             {
-                user = nameUser;
-                passwd = password;
+                user = nameUser; // Inicializa o Membro user com o valor de nameUser.
+                passwd = password; // Inicializa o Membro passwd com o valor de password.
             }
         }
 
-        static string input, output = "Info Estudantes";
+        static string input, output = "Info Estudantes"; // Declaração de duas variáveis estáticas do tipo string para ser usada durante todo o decorrer do programa, sendo o input para ser escrita pela utilizador, e output para fins de salvamento de arquivo.
 
-        static int op;
+        static int op; // Declaração de uma variável estática do tipo inteiro para ser usada durante todo o decorrer do programa.
 
-        static string[] subjects = new string[0];
+        static string[] subjects = new string[0]; // Vetor do tipo string para armazenar 
 
-        static readonly string[] files = { "nomes.txt", "notas.txt", "faltas.txt", "loginprofessores.txt" };
+        static readonly string[] files = { "nomes.txt", "notas.txt", "faltas.txt", "loginprofessores.txt" }; // vetor de quantidade 4, os quais indicam os nomes dos arquivos utilizados.
 
-        static string[] lines;
+        static string[] lines; // Vetor do tipo string para armazenar linhas dos arquivos.
 
-        static Aluno[] alunos = new Aluno[0];
+        static Aluno[] alunos = new Aluno[0]; // vetor do tipo Aluno.
 
         static void Main(string[] args)
         {
-            Initializer();
+            Initializer(); // Chamada do método que inicia todo o programa.
         }
 
-        static void LoadUsers()
+        static void LoadUsers() // Método para carregar as credenciais dos utilizadores do arquivo que está no índice 3 do vetor files, que é o loginprofessores.txt.
         {
-            if (File.Exists(files[3]))
+            if (File.Exists(files[3])) // Checa se o arquivo existe.
             {
-                var lines = File.ReadAllLines(files[3]);
+                var lines = File.ReadAllLines(files[3]); // Lê todas as linhas do arquivo loginprofessores.txt.
                 foreach (var line in lines)
                 {
-                    var data = line.Split(';');
+                    var data = line.Split(';'); // Divide cada linha do arquivo pelos caracteres ';'.
                     if (data.Length == 2)
                     {
-                        UserAccount user = new UserAccount(data[0], data[1]);
+                        UserAccount user = new UserAccount(data[0], data[1]); // Cria um novo objeto UserAccount com os dados do utilizador.
                     }
                 }
+                Console.WriteLine("\nCredenciais carregadas\n"); // Informa que as credenciais foram carregadas.
+            }
+            else // Se o arquivo não existir, avisa o utilizador do programa pela seguinte mensagem:
+            {
+                Console.WriteLine("\n O arquivo de credenciais não existe, registe um utilizador para criar o arquivo automaticamente.\n"); // Informa que o arquivo não existe e pede para registar um novo utilizador.
             }
         }
-        static void CreateUser()
+
+        static void CreateUser() // Método para criar um utilizador para que seja possível acessar o menu através do login.
         {
             UserAccount newUser;
 
             Console.Clear();
             Console.Write("(Digite 0 para sair) Insira o nome de utilizador: ");
-            string username = Console.ReadLine();
+            string username = Console.ReadLine(); // Lê o nome de utilizador.
 
-            if (username == "0")
-            {
-                LoginScreen();
-            }
+            if (username == "0") LoginScreen(); // Volta para a tela de login se o utilizador digitar "0".
 
             Console.Write("(Digite 0 para sair) Insira uma senha: ");
-            string password = Console.ReadLine();
+            string password = Console.ReadLine(); // Lê a senha do utilizador.
 
-            if (password == "0")
-            {
-                LoginScreen();
-            }
+            if (password == "0") LoginScreen(); // Volta para a tela de login se o utilizador digitar "0".
 
             Console.Write("(Digite 0 para sair) Confirme a senha: ");
-            string confirmPassword = Console.ReadLine();
+            string confirmPassword = Console.ReadLine(); // Lê a confirmação da senha.
 
-            if (confirmPassword == "0")
-            {
-                LoginScreen();
-            }
+            if (confirmPassword == "0") LoginScreen(); // Volta para a tela de login se o utilizador digitar "0".
 
             while (confirmPassword != password)
             {
-                Console.WriteLine("As senhas não coincidem. Tente novamente.");
+                Console.WriteLine("As senhas não coincidem. Tente novamente."); // Informa que as senhas não coincidem e pede para tentar novamente.
 
                 Console.Write($"Insira a senha de {username}: ");
-                password = Console.ReadLine();
+                password = Console.ReadLine(); // Lê a senha novamente.
 
                 Console.Write("Confirme a senha: ");
-                confirmPassword = Console.ReadLine();
+                confirmPassword = Console.ReadLine(); // Lê a confirmação da senha novamente.
             }
 
             if (UserExists(username) == true)
             {
-                Console.WriteLine("Este utilizador já existe");
+                Console.WriteLine("Este utilizador já existe"); // Informa que o utilizador já existe.
                 Console.WriteLine("Pressione qualquer tecla para voltar ao menu de login...");
                 Console.ReadKey();
-                LoginScreen();
+                LoginScreen(); // Volta para a tela de login.
             }
             else
             {
-
                 if (!File.Exists(files[3]))
                 {
-                    File.Create(files[3]).Close();
+                    File.Create(files[3]).Close(); // Cria o arquivo loginprofessores.txt se não existir.
                 }
 
-                newUser = new UserAccount(username, password);
-
+                newUser = new UserAccount(username, password); // Cria um novo objeto UserAccount com o nome de utilizador e a senha.
 
                 using (StreamWriter sw = new StreamWriter(files[3], true))
                 {
-                    sw.WriteLine($"{newUser.User};{newUser.Passwd}");
+                    sw.WriteLine($"{newUser.User};{newUser.Passwd}"); // Escreve o novo utilizador no arquivo loginprofessores.txt.
                 }
 
-                Console.WriteLine("Utilizador registado com sucesso!");
+                Console.WriteLine("Utilizador registado com sucesso!"); // Informa que o utilizador foi registado com sucesso.
                 Console.WriteLine("Pressione qualquer tecla para voltar ao menu... ");
                 Console.ReadKey();
-                LoginScreen();
-
+                LoginScreen(); // Volta para a tela de login.
             }
-
         }
 
-        static bool UserExists(string username)
+        static bool UserExists(string username) // Método para verificar se o utilizador já existe.
         {
             if (File.Exists(files[3]))
             {
-                var lines = File.ReadAllLines(files[3]);
+                var lines = File.ReadAllLines(files[3]); // Lê todas as linhas do arquivo loginprofessores.txt.
                 foreach (var line in lines)
                 {
-                    var data = line.Split(';');
+                    var data = line.Split(';'); // Divide cada linha do arquivo pelos caracteres ';'.
                     if (data.Length == 2 && data[0].Equals(username, StringComparison.OrdinalIgnoreCase))
                     {
-                        return true;
+                        return true; // Retorna true se o nome de utilizador já existir.
                     }
                 }
             }
-            return false;
+            return false; // Retorna false se o nome de utilizador não existir.
         }
 
-        static void LoginScreen()
+        static void LoginScreen() // Método para mostrar a tela de login.
         {
             Console.Clear();
-            LoadUsers();
-            LoginMenu();
+            LoadUsers(); // Carrega as credenciais dos utilizadores.
+            LoginMenu(); // Mostra o menu de login.
             Console.Write("Insira a opção: ");
-            input = Console.ReadLine();
+            input = Console.ReadLine(); // Lê a opção escolhida pelo utilizador.
             switch (input)
             {
-
                 case "1":
-                    StartLogin();
+                    StartLogin(); // Inicia o processo de login.
                     break;
                 case "2":
-                    CreateUser();
+                    CreateUser(); // Inicia o processo de criação de um novo utilizador.
                     break;
                 case "0":
-                    Environment.Exit(0);
+                    Environment.Exit(0); // Sai do programa.
                     break;
                 default:
-                    Console.WriteLine("Opção inválida");
-                    LoginScreen();
+                    Console.WriteLine("Opção inválida"); // Informa que a opção é inválida.
+                    LoginScreen(); // Volta para a tela de login.
                     break;
             }
         }
-        static void StartLogin()
+
+        static void StartLogin() // Método para iniciar o processo de login.
         {
             string username;
             string password;
 
             Console.Clear();
             Console.Write("(Digite 0 para sair) insira o nome de utilizador: ");
-            username = Console.ReadLine();
-            if (username == "0")
-            {
-                LoginScreen();
-            }
+            username = Console.ReadLine(); // Lê o nome de utilizador.
+
+            if (username == "0") LoginScreen(); // Volta para a tela de login se o utilizador digitar "0".
 
             Console.Write($"(Digite 0 para sair) Insira a senha de {username}: ");
-            password = Console.ReadLine();
+            password = Console.ReadLine(); // Lê a senha do utilizador.
 
-            if (password == "0")
-            {
-                LoginScreen();
-            }
+            if (password == "0") LoginScreen(); // Volta para a tela de login se o utilizador digitar "0".
 
-            if (VerifyLogin(username, password))
-            {
-                Console.WriteLine($"\n bem vindo/a {username}!\n");
-            }
+            if (VerifyLogin(username, password)) Console.WriteLine($"\n Bem-vindo/a {username}!\n"); // Informa que o login foi bem-sucedido.
+            
             else
             {
-                Console.WriteLine("\nCredenciais inválidas\n");
+                Console.WriteLine("\nCredenciais inválidas\n"); // Informa que as credenciais são inválidas.
                 Console.ReadKey();
                 Console.Clear();
-                StartLogin();
+                StartLogin(); // Tenta fazer o login novamente.
             }
         }
 
-        static bool VerifyLogin(string username, string password)
+        static bool VerifyLogin(string username, string password) // Método para verificar as credenciais de login.
         {
             if (File.Exists(files[3]))
             {
-                var lines = File.ReadAllLines(files[3]);
+                var lines = File.ReadAllLines(files[3]); // Lê todas as linhas do arquivo loginprofessores.txt.
                 foreach (var line in lines)
                 {
-                    var data = line.Split(';');
+                    var data = line.Split(';'); // Divide cada linha do arquivo pelos caracteres ';'.
                     if (data.Length == 2 && data[0].Equals(username, StringComparison.OrdinalIgnoreCase))
                     {
-                        // Verifica a senha correspondente
-                        if (data[1] == password)
-                        {
-                            return true;
-                        }
+                        // Verifica a senha correspondente.
+                        if (data[1] == password) return true; // Retorna true se o nome de utilizador e a senha corresponderem.
+                        
                     }
                 }
             }
-            return false;
-
+            return false; // Retorna false se o nome de utilizador e a senha não corresponderem.
         }
 
-        static void LoginMenu()
+        static void LoginMenu() // Método para mostrar o menu de login.
         {
             Console.WriteLine("1. Logar" +
                 "\n2. Registar" +
-                "\n0. Sair");
+                "\n0. Sair"); // Opções do menu de login.
         }
+
 
         static void Initializer()
         {
