@@ -334,16 +334,21 @@ namespace PJF_M7
                 "\n2 - Logar como admin" +
                 "\n0 - Sair"); // Opções do menu de login.
         }
-        static void Initializer()
+        static void Initializer() // Método que inicia a inicialização do programa.
         {
+            // Verifica se o arquivo principal ou seu backup existem.
             if (File.Exists(files[0]) || File.Exists(files[0] + ".bak"))
             {
-                if (!File.Exists(files[0]) && File.Exists(files[0] + ".bak")) File.Copy(files[0] + ".bak", files[0], true);
+                // Se apenas o backup existe, restaura o arquivo principal.
+                if (!File.Exists(files[0]) && File.Exists(files[0] + ".bak"))
+                    File.Copy(files[0] + ".bak", files[0], true);
 
+                // Lê todas as linhas do arquivo principal.
                 lines = File.ReadAllLines(files[0]);
-                Array.Resize(ref alunos, lines.Length / 3);
+                Array.Resize(ref alunos, lines.Length / 3); // Ajusta o tamanho do array de alunos.
 
                 int i = 0;
+                // Itera pelas linhas lidas, preenchendo os dados dos alunos.
                 for (int j = 0; j < lines.Length; j += 3)
                 {
                     alunos[i].nome = File.ReadAllLines(files[0])[j];
@@ -354,26 +359,37 @@ namespace PJF_M7
                     i++;
                 }
             }
-            else File.Create(files[0]).Close(); 
+            else
+            {
+                // Se o arquivo principal não existe, cria um novo.
+                File.Create(files[0]).Close();
+            }
 
+            // Verifica se o segundo arquivo ou seu backup existem.
             if (File.Exists(files[1]) || File.Exists(files[1] + ".bak"))
             {
-                if (!File.Exists(files[1]) && File.Exists(files[1] + ".bak")) File.Copy(files[1] + ".bak", files[1], true);
+                // Se apenas o backup existe, restaura o arquivo principal.
+                if (!File.Exists(files[1]) && File.Exists(files[1] + ".bak"))
+                    File.Copy(files[1] + ".bak", files[1], true);
 
+                // Lê todo o conteúdo do segundo arquivo e divide pelas marcas 'b'.
                 lines = File.ReadAllText(files[1]).Split(new char[] { 'b' }, StringSplitOptions.None);
 
+                // Itera pelas linhas divididas.
                 for (int i = 0; i < lines.Length; i++)
                 {
                     int k = 0;
 
+                    // Divide cada linha pelo separador de nova linha.
                     string[] sublines = lines[i].Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
                     if (sublines.Length > 0)
                     {
-                        alunos[i].materia = new Disciplina[0];
+                        alunos[i].materia = new Disciplina[0]; // Inicializa o array de disciplinas.
 
-                        Array.Resize(ref alunos[i].materia, sublines.Length / 2);
+                        Array.Resize(ref alunos[i].materia, sublines.Length / 2); // Ajusta o tamanho do array de disciplinas.
 
+                        // Preenche as disciplinas do aluno.
                         for (int j = 0; j < sublines.Length; j += 2)
                         {
                             alunos[i].materia[k].nome = sublines[j];
@@ -383,26 +399,37 @@ namespace PJF_M7
                     }
                 }
             }
-            else File.Create(files[1]).Close();
+            else
+            {
+                // Se o segundo arquivo principal não existe, cria um novo.
+                File.Create(files[1]).Close();
+            }
 
+            // Verifica se o terceiro arquivo ou seu backup existem.
             if (File.Exists(files[2]) || File.Exists(files[2] + ".bak"))
             {
-                if (!File.Exists(files[2]) && File.Exists(files[2] + ".bak")) File.Copy(files[2] + ".bak", files[2], true);
+                // Se apenas o backup existe, restaura o arquivo principal.
+                if (!File.Exists(files[2]) && File.Exists(files[2] + ".bak"))
+                    File.Copy(files[2] + ".bak", files[2], true);
 
+                // Lê todo o conteúdo do terceiro arquivo e divide pelas marcas 'b'.
                 lines = File.ReadAllText(files[2]).Split(new char[] { 'b' }, StringSplitOptions.None);
 
+                // Itera pelas linhas divididas.
                 for (int i = 0; i < lines.Length; i++)
                 {
                     int k = 0;
 
+                    // Divide cada linha pelo separador de nova linha.
                     string[] sublines = lines[i].Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
                     if (sublines.Length > 0)
                     {
-                        alunos[i].faltas = new Falta[0];
+                        alunos[i].faltas = new Falta[0]; // Inicializa o array de faltas.
 
-                        Array.Resize(ref alunos[i].faltas, sublines.Length / 2);
+                        Array.Resize(ref alunos[i].faltas, sublines.Length / 2); // Ajusta o tamanho do array de faltas.
 
+                        // Preenche as faltas do aluno.
                         for (int j = 0; j < sublines.Length; j += 2)
                         {
                             alunos[i].faltas[k].disciplina = sublines[j];
@@ -414,14 +441,16 @@ namespace PJF_M7
             }
             else
             {
+                // Se o terceiro arquivo principal não existe, cria um novo.
                 File.Create(files[2]).Close();
             }
 
-            LoginScreen();
-            ChooseOption();
+            LoginScreen(); // Chama a tela de login.
+            ChooseOption(); // Chama a função para escolher a próxima opção.
         }
 
-        static void ShowMenu()
+
+        static void ShowMenu() // Mostra o menu
         {
             Console.WriteLine(
                 $"1 - Guardar as informações dos estudantes na pasta '{output}' localizada no Ambiente de trabalho" +
@@ -436,47 +465,47 @@ namespace PJF_M7
                 );
         }
 
-        static void ChooseOption()
+        static void ChooseOption() //Método para escolher a opção que o próprio utilzador vai utilizar.
         {
             bool check = true;
             do
             {
                 if (check)
                 {
-                    ShowMenu();
+                    ShowMenu(); // Mostra o menu
                     Console.Write("\nEscolha uma das opções acima: ");
                 }
                 check = true;
-                input = Console.ReadLine();
+                input = Console.ReadLine(); // input para o switch case
 
                 switch (input)
                 {
                     case "1":
-                        OutputInfo();
+                        OutputInfo(); // Chama o respectivo método.
                         break;
                     case "2":
-                        AddStudent();
+                        AddStudent(); // Chama o respectivo método.
                         break;
                     case "3":
-                        RemoveStudent();
+                        RemoveStudent(); // Chama o respectivo método.
                         break;
                     case "4":
-                        EditStudent();
+                        EditStudent();  // Chama o respectivo método.
                         break;
                     case "5":
-                        AddSubject();
+                        AddSubject(); // Chama o respectivo método.
                         break;
                     case "6":
-                        RemoveSubject();
+                        RemoveSubject(); // Chama o respectivo método.
                         break;
                     case "7":
-                        FilesInfo();
+                        FilesInfo(); // Chama o respectivo método.
                         break;
                     case "8":
-                        LoginScreen();
+                        LoginScreen(); // Chama o respectivo método.
                         break;
                     case "0":
-                        input = "\u0000";
+                        input = "\u0000"; // null
                         break;
                     default:
                         Console.Write("\nOpção inválida, tente novamente: ");
@@ -485,23 +514,30 @@ namespace PJF_M7
                 }
             } while (input != "\u0000");
 
-            Saver();
+            Saver(); // // Chama o respectivo método que salva.
         }
 
-
-        static void RemoveSubject()
+        static void RemoveSubject() // Método para remover uma disciplina.
         {
-            if(alunos.Length > 0)
+            // Verifica se há alunos registrados
+            if (alunos.Length > 0)
             {
-                ListStudents();
+                ListStudents(); // Lista os estudantes para escolha
                 Console.Write("Insira o estudante que quer remover a disciplina: ");
-                do 
+
+                // Valida a escolha do estudante e verifica se ele tem disciplinas registradas
+                do
                 {
                     int.TryParse(Console.ReadLine(), out op);
-                    if (op < 1 || op - 1 >= alunos.Length) Console.Write("Opção inválida, tente novamente: ");
-                    else if (alunos[op - 1].materia.Length < 1) Console.Write("Esse estudante está em nunhuma disciplina, tente outro estudante: ");
+                    if (op < 1 || op - 1 >= alunos.Length)
+                        Console.Write("Opção inválida, tente novamente: ");
+                    else if (alunos[op - 1].materia.Length < 1)
+                        Console.Write("Esse estudante não está em nenhuma disciplina, tente outro estudante: ");
                 } while (op < 1 || op - 1 >= alunos.Length || alunos[op - 1].materia.Length < 1);
-                op--;
+
+                op--; // Ajusta o índice do estudante selecionado
+
+                // Exibe as disciplinas que o estudante participa
                 if (alunos[op].materia.Length > 0)
                 {
                     Console.WriteLine($"Disciplinas que {alunos[op].nome} participa: ");
@@ -509,15 +545,22 @@ namespace PJF_M7
                     {
                         Console.WriteLine($"{i + 1} - {alunos[op].materia[i].nome}");
                     }
-                    Console.Write("Insire a disciplina que gostaria de remover" +
-                        "\nInsire nada se quiser cancelar: ");
+
+                    // Solicita ao utilizador que escolha a disciplina a ser removida
+                    Console.Write("Insira o número da disciplina que gostaria de remover" +
+                        "\nInsira nada se quiser cancelar: ");
+
+                    // Valida a escolha da disciplina a ser removida
                     do
                     {
                         input = Console.ReadLine();
-                        if ((int.Parse(input) < 1 || int.Parse(input) - 1 >= alunos[op].materia.Length) && input != "") Console.Write("Valor inválido, tente novamente: ");
+                        if ((int.Parse(input) < 1 || int.Parse(input) - 1 >= alunos[op].materia.Length) && input != "")
+                            Console.Write("Valor inválido, tente novamente: ");
                     } while ((int.Parse(input) < 1 || int.Parse(input) - 1 >= alunos[op].materia.Length) && input != "");
+
                     if (input != "")
                     {
+                        // Remove a disciplina selecionada do aluno
                         for (int i = 0; i < alunos[op].materia.Length; i++)
                         {
                             alunos[op].materia[i - 1] = alunos[op].materia[i];
@@ -527,43 +570,60 @@ namespace PJF_M7
                         Array.Resize(ref alunos[op].faltas, alunos[op].faltas.Length - 1);
                     }
                 }
-                else Console.WriteLine("Não existem disciplinas registradas neste aluno\n");
+                else Console.WriteLine("Não existem disciplinas registradas para este aluno\n");
+
             }
-            else Console.WriteLine("Não existem alunos registrados");
+            else Console.WriteLine("Não existem alunos registrados"); // Informa se não há alunos registrados
 
             Console.WriteLine("\n");
         }
 
-        static void AddSubject()
+        static void AddSubject() // Método para adicioanr uma disciplina.
         {
-            if(alunos.Length > 0)
+            // Verifica se há alunos registrados.
+            if (alunos.Length > 0)
             {
-                ListStudents();
+                ListStudents(); // Lista os estudantes para escolha
                 Console.Write("\nInsira o estudante que gostaria de adicionar uma disciplina" +
-                    "\nInsire nada para cancelar: ");
+                    "\nInsira nada para cancelar: ");
+
+                // Valida a escolha do estudante
                 do
                 {
                     input = Console.ReadLine();
                     int.TryParse(input, out op);
-                    if ((op < 1 || op - 1 >= alunos.Length) && input != "") Console.Write("Valor inválido, tente novamente: ");
+                    if ((op < 1 || op - 1 >= alunos.Length) && input != "")
+                        Console.Write("Valor inválido, tente novamente: ");
                 } while ((op < 1 || op - 1 >= alunos.Length) && input != "");
+
                 if (input != "")
                 {
-                    op--;
-                    Console.Write($"Insira a disciplina que gostarida de adicionar a {alunos[op].nome}: ");
+                    op--; // Ajusta o índice do estudante selecionado
+                    Console.Write($"Insira o nome da disciplina que gostaria de adicionar a {alunos[op].nome}: ");
+
+                    // Valida o nome da disciplina a ser adicionada
                     do
                     {
                         input = Console.ReadLine().ToLower();
-                        if (Array.FindIndex(alunos[op].materia, s => s.nome.ToLower() == input.ToLower()) != -1) Console.Write("Esse estudante já está nessa disciplina: ");
-                        if (input.Length < 2) Console.Write("O nome da disciplina não pode ser menor que 2 caracteres: ");
+                        // Verifica se o estudante já está matriculado nesta disciplina
+                        if (Array.FindIndex(alunos[op].materia, s => s.nome.ToLower() == input.ToLower()) != -1)
+                            Console.Write("Esse estudante já está matriculado nesta disciplina: ");
+                        // Verifica se o nome da disciplina tem pelo menos 2 caracteres
+                        if (input.Length < 2)
+                            Console.Write("O nome da disciplina não pode ser menor que 2 caracteres: ");
                     } while (Array.FindIndex(alunos[op].materia, s => s.nome.ToLower() == input.ToLower()) != -1 || input.Length < 2);
+
+                    // Aumenta o tamanho dos arrays de disciplinas e faltas do estudante selecionado
                     Array.Resize(ref alunos[op].materia, alunos[op].materia.Length + 1);
                     Array.Resize(ref alunos[op].faltas, alunos[op].faltas.Length + 1);
+
+                    // Adiciona a nova disciplina e suas faltas ao estudante selecionado
                     alunos[op].materia[alunos[op].materia.Length - 1] = new Disciplina { nome = input, nota = 0 };
                     alunos[op].faltas[alunos[op].faltas.Length - 1] = new Falta { disciplina = input, faltas = 0 };
                 }
             }
-            else Console.WriteLine("Não existem alunos registrados");
+            else Console.WriteLine("Não existem alunos registrados"); // Informa se não há alunos registrados
+
 
             Console.WriteLine("\n");
         }
@@ -677,75 +737,96 @@ namespace PJF_M7
             Console.WriteLine("\n");
         }
 
-        static void AddStudent()
+        static void AddStudent() // Método para adicionar um estudante.
         {
             Console.Write("Insira o nome do estudante" +
-                "\nInsire nada para cancelar: ");
+                "\nInsira nada para cancelar: ");
 
+            // Loop para receber e validar o nome do estudante
             do
             {
                 input = Console.ReadLine();
-                if (input.Length < 3 && input != "") Console.Write("O nome não pode ser menor que 3 caracteres: ");
-                if (Array.FindIndex(alunos, s => s.nome == input) != -1 && input != "") Console.Write("Já existe um aluno com esse nome: ");
+                // Verifica se o nome tem pelo menos 3 caracteres
+                if (input.Length < 3 && input != "")
+                    Console.Write("O nome não pode ser menor que 3 caracteres: ");
+                // Verifica se já existe um aluno com o mesmo nome (ignorando maiúsculas/minúsculas)
+                if (Array.FindIndex(alunos, s => s.nome.ToLower() == input.ToLower()) != -1 && input != "")
+                    Console.Write("Já existe um aluno com esse nome: ");
             } while ((input.Length < 3 || Array.FindIndex(alunos, s => s.nome.ToLower() == input.ToLower()) != -1) && input != "");
+
+            // Se o usuário não cancelou (digitou algo)
             if (input != "")
             {
-                Array.Resize(ref alunos, alunos.Length + 1);
-                alunos[alunos.Length - 1].nome = input;
+                Array.Resize(ref alunos, alunos.Length + 1); // Aumenta o tamanho do array de alunos
+                alunos[alunos.Length - 1].nome = input; // Define o nome do novo aluno
 
                 Console.Write("Insira a turma do estudante: ");
+                // Loop para receber e validar o nome da turma
                 do
                 {
                     input = Console.ReadLine();
-                    if (input.Length == 0) Console.Write("O nome da turma não pode ser menor de 1 carácter: ");
+                    // Verifica se o nome da turma tem pelo menos 1 caractere
+                    if (input.Length == 0)
+                        Console.Write("O nome da turma não pode ser menor de 1 caractere: ");
                 } while (input.Length == 0);
-                alunos[alunos.Length - 1].turma = input;
 
+                alunos[alunos.Length - 1].turma = input; // Define a turma do novo aluno
+
+                // Define o número do aluno como o maior número atual + 1
                 alunos[alunos.Length - 1].numero = alunos.Max(s => s.numero) + 1;
 
+                // Inicializa os arrays de disciplinas e faltas do novo aluno como vazios
                 alunos[alunos.Length - 1].materia = new Disciplina[0];
-
                 alunos[alunos.Length - 1].faltas = new Falta[0];
 
+                // Ordena o array de alunos pelo nome
                 Array.Sort(alunos, (x, y) => x.nome.CompareTo(y.nome));
             }
 
             Console.WriteLine("\n");
         }
 
-        static void ListStudents()
+        static void ListStudents() // Método para mostrar todos os estudantes.
         {
-            for(int i = 0; i < alunos.Length; i++)
+            // Percorre a lista de alunos
+            for (int i = 0; i < alunos.Length; i++)
             {
-                Console.WriteLine(i + 1 + " - " + alunos[i].nome);
+                // Exibe o índice (iniciado em 1) e o nome do aluno
+                Console.WriteLine((i + 1) + " - " + alunos[i].nome);
             }
         }
 
-        static void EditStudent()
+        static void EditStudent() // Método para editar algum estudante.
         {
-            if(alunos.Length > 0)
+            // Verifica se há alunos registrados
+            if (alunos.Length > 0)
             {
                 bool check;
-                ListStudents();
+                ListStudents(); // Exibe a lista de alunos
                 Console.Write("Insira o estudante que gostaria de editar: ");
+
+                // Lê e valida a entrada do utilizador para selecionar um aluno
                 do
                 {
                     int.TryParse(Console.ReadLine(), out op);
-                    if (op < 1 || op - 1 >= alunos.Length) Console.Write("Valor inválido tente novamente: ");
+                    if (op < 1 || op - 1 >= alunos.Length) Console.Write("Valor inválido, tente novamente: ");
                 } while (op < 1 || op - 1 >= alunos.Length);
                 op--;
 
+                // Exibe opções de edição
                 Console.WriteLine("1 - Editar notas " +
                     "\n2 - Editar faltas " +
                     "\n3 - Editar Informações do estudante " +
                     "\n0 - Cancelar \n");
                 Console.Write("Escolha uma das opções acima: ");
+
+                // Processa a opção selecionada pelo utilizador
                 do
                 {
                     check = true;
                     switch (Console.ReadLine())
                     {
-                        case "1":
+                        case "1": // Editar notas
                             for (int i = 0; i < alunos[op].materia.Length; i++)
                             {
                                 Console.Write($"Insira a nova nota de {alunos[op].nome} " +
@@ -755,13 +836,16 @@ namespace PJF_M7
                                 do
                                 {
                                     input = Console.ReadLine();
-                                    if ((double.Parse(input) < 0 || double.Parse(input) > 20) && input != "") Console.Write("Valor inválido, tente novamente: ");
+                                    // Verifica se a nota está no intervalo válido
+                                    if ((double.Parse(input) < 0 || double.Parse(input) > 20) && input != "")
+                                        Console.Write("Valor inválido, tente novamente: ");
                                 } while ((double.Parse(input) < 0 || double.Parse(input) > 20) && input != "");
-                                if(input != "") double.TryParse(input, out alunos[op].materia[i].nota);
+                                if (input != "")
+                                    double.TryParse(input, out alunos[op].materia[i].nota); // Atualiza a nota
                             }
                             break;
-                        case "2":
-                            for(int i = 0; i < alunos[op].faltas.Length; i++)
+                        case "2": // Editar faltas
+                            for (int i = 0; i < alunos[op].faltas.Length; i++)
                             {
                                 Console.Write($"Insira o número de faltas de {alunos[op].nome} " +
                                     $"na disciplina {alunos[op].faltas[i].disciplina}" +
@@ -770,65 +854,84 @@ namespace PJF_M7
                                 do
                                 {
                                     input = Console.ReadLine();
-                                    if (int.Parse(input) < 0 && input != "") Console.Write("Valor inválido, tente novamente: ");
+                                    // Verifica se o número de faltas é válido
+                                    if (int.Parse(input) < 0 && input != "")
+                                        Console.Write("Valor inválido, tente novamente: ");
                                 } while (int.Parse(input) < 0 && input != "");
-                                if(input != "")int.TryParse(input, out alunos[op].faltas[i].faltas);
+                                if (input != "")
+                                    int.TryParse(input, out alunos[op].faltas[i].faltas); // Atualiza o número de faltas
                             }
                             break;
-                        case "3":
+                        case "3": // Editar informações do aluno
                             Console.Write($"Insira o novo nome de {alunos[op].nome}" +
                                 $"\nInsire nada se não quiser alterar: ");
                             do
                             {
                                 input = Console.ReadLine();
-                                if (input.Length < 2 && input != "") Console.Write("O novo nome não pode ser menor que 3 caracteres: ");
+                                // Verifica se o nome tem no mínimo 3 caracteres
+                                if (input.Length < 2 && input != "")
+                                    Console.Write("O novo nome não pode ser menor que 3 caracteres: ");
                             } while (input.Length < 2 && input != "");
-                            if (input != "") alunos[op].nome = input;
+                            if (input != "")
+                                alunos[op].nome = input; // Atualiza o nome
                             Console.Write($"Insira a nova turma, a atual é {alunos[op].turma}" +
                                 $"\nInsire nada se não quiser alterar: ");
                             input = Console.ReadLine();
-                            if (input != "") alunos[op].turma = input;
+                            if (input != "")
+                                alunos[op].turma = input; // Atualiza a turma
                             break;
-                        case "0":
+                        case "0": // Cancelar
                             Console.WriteLine("Saindo...");
                             break;
-                        default:
+                        default: // Opção inválida
                             check = false;
                             Console.Write("Opção inválida, tente novamente: ");
                             break;
                     }
                 } while (!check);
             }
-            else Console.WriteLine("Não existem alunos registrados");
+            else
+            {
+                Console.WriteLine("Não existem alunos registrados"); // Informa se não há alunos registrados
+            }
 
             Console.WriteLine("\n");
         }
 
         static void RemoveStudent()
         {
-            if(alunos.Length > 0) 
-            { 
-                ListStudents();
+            // Verifica se há alunos registrados
+            if (alunos.Length > 0)
+            {
+                ListStudents(); // Exibe a lista de alunos
                 Console.Write("Insira o estudante que gostaria de remover: ");
                 do
                 {
+                    // Lê a entrada do utilizador e tenta convertê-la para um número inteiro
                     int.TryParse(Console.ReadLine(), out op);
-                    if (op <= -1 || op - 1 >= alunos.Length) Console.Write("Valor inválido tente novamente: ");
+                    // Verifica se o valor inserido é válido
+                    if (op <= -1 || op - 1 >= alunos.Length) Console.Write("Valor inválido, tente novamente: ");
                 } while (op <= -1 || op - 1 >= alunos.Length);
 
+                // Confirmação para remover o aluno selecionado
                 Console.WriteLine($"Tem mesmo a certeza que quer remover {alunos[op - 1].nome}?" +
                     $"\nInsire '1' se quiser continuar" +
-                    $"\nQualquer outro valor cancelerá a operação");
-                
+                    $"\nQualquer outro valor cancelará a operação");
+
                 input = Console.ReadLine();
 
-                if(input == "1")
+                // Se o utilizador confirmar (digitando '1'), remove o aluno
+                if (input == "1")
                 {
+                    // Desloca os elementos do array para preencher o espaço do aluno removido
                     for (int i = op; i < alunos.Length; i++) alunos[i - 1] = alunos[i];
+                    // Redimensiona o array para remover o último elemento
                     Array.Resize(ref alunos, alunos.Length - 1);
                 }
             }
-            else Console.WriteLine("Não existem alunos registrados");
+
+            else Console.WriteLine("Não existem alunos registrados"); // Informa se não há alunos registrados
+
 
             Console.WriteLine("\n");
         }
@@ -837,7 +940,9 @@ namespace PJF_M7
         {
             try
             {
+                // Obtém arquivos de saída na área de trabalho com extensão .txt
                 string[] outFiles = Directory.GetFiles(Path.Combine(Environment.SpecialFolder.Desktop.ToString(), output), "*.txt");
+                // Exibe informações de cada arquivo de saída
                 foreach (var file in outFiles)
                 {
                     FileInfo info = new FileInfo(file);
@@ -845,21 +950,24 @@ namespace PJF_M7
                         $"\nNome - {info.Name}" +
                         $"\nTamanho - {info.Length} Bytes" +
                         $"\nData de criação - {info.CreationTime:dddd dd-MM-yyyy HH:mm}"
-                        );
+                    );
                 }
             }
             catch { }
 
+            // Exibe informações dos arquivos na lista 'files'
             foreach (var file in files)
             {
                 FileInfo info = new FileInfo(file);
-                Console.WriteLine( 
+                Console.WriteLine(
                     $"\nNome - {info.Name}" +
                     $"\nTamanho - {info.Length} Bytes" +
                     $"\nData de criação - {info.CreationTime:dddd dd-MM-yyyy HH:mm}" +
                     $"\nÚltima modificação - {info.LastWriteTime:dddd dd-MM-yyyy HH:mm}" +
                     $"\nÚltimo acesso - {info.LastAccessTime:dddd dd-MM-yyyy HH:mm}"
-                    );
+                );
+
+                // Exibe informações do arquivo de backup, se existir
                 try
                 {
                     info = new FileInfo(file + ".bak");
@@ -869,7 +977,7 @@ namespace PJF_M7
                         $"\nData de criação - {info.CreationTime:dddd dd-MM-yyyy HH:mm}" +
                         $"\nÚltima modificação - {info.LastWriteTime:dddd dd-MM-yyyy HH:mm}" +
                         $"\nÚltimo acesso - {info.LastAccessTime:dddd dd-MM-yyyy HH:mm}"
-                        );
+                    );
                 }
                 catch { }
             }
@@ -878,44 +986,49 @@ namespace PJF_M7
 
         static void Saver()
         {
+            // Faz uma cópia de backup de cada arquivo na lista 'files'
             for (int i = 0; i < files.Length; i++)
             {
-                File.Copy(files[i], files[i] + ".bak", true);
-            }
-            using (StreamWriter writer = new StreamWriter(files[0]))
-            {
-                for(int i = 0; i < alunos.Length; i++)
-                {
-                    writer.WriteLine(alunos[i].nome);
-                    writer.WriteLine(alunos[i].turma);
-                    writer.WriteLine(alunos[i].numero);
-                }
-                writer.Close();
+                File.Copy(files[i], files[i] + ".bak", true); // Cria uma cópia com a extensão .bak
             }
 
-            using(StreamWriter writer = new StreamWriter(files[1]))
+            // Escreve os dados dos alunos no primeiro arquivo da lista 'files'
+            using (StreamWriter writer = new StreamWriter(files[0]))
             {
                 for (int i = 0; i < alunos.Length; i++)
                 {
-                    for(int j = 0; j < alunos[i].materia.Length; j++)
+                    writer.WriteLine(alunos[i].nome); // Escreve o nome do aluno
+                    writer.WriteLine(alunos[i].turma); // Escreve a turma do aluno
+                    writer.WriteLine(alunos[i].numero); // Escreve o número do aluno
+                }
+                writer.Close(); // Fecha o StreamWriter
+            }
+
+            // Escreve os dados das matérias e notas dos alunos no segundo arquivo da lista 'files'
+            using (StreamWriter writer = new StreamWriter(files[1]))
+            {
+                for (int i = 0; i < alunos.Length; i++)
+                {
+                    for (int j = 0; j < alunos[i].materia.Length; j++)
                     {
-                        writer.WriteLine(alunos[i].materia[j].nome);
-                        writer.WriteLine(alunos[i].materia[j].nota);
+                        writer.WriteLine(alunos[i].materia[j].nome); // Escreve o nome da matéria
+                        writer.WriteLine(alunos[i].materia[j].nota); // Escreve a nota da matéria
                     }
-                    if (i + 1 != alunos.Length) writer.WriteLine("b");
+                    if (i + 1 != alunos.Length) writer.WriteLine("b"); // Escreve 'b' se não for o último aluno
                 }
             }
 
+            // Escreve os dados das faltas dos alunos no terceiro arquivo da lista 'files'
             using (StreamWriter writer = new StreamWriter(files[2]))
             {
                 for (int i = 0; i < alunos.Length; i++)
                 {
                     for (int j = 0; j < alunos[i].faltas.Length; j++)
                     {
-                        writer.WriteLine(alunos[i].faltas[j].disciplina);
-                        writer.WriteLine(alunos[i].faltas[j].faltas);
+                        writer.WriteLine(alunos[i].faltas[j].disciplina); // Escreve o nome da disciplina
+                        writer.WriteLine(alunos[i].faltas[j].faltas); // Escreve o número de faltas
                     }
-                    if (i + 1 != alunos.Length) writer.WriteLine("b");
+                    if (i + 1 != alunos.Length) writer.WriteLine("b"); // Escreve 'b' se não for o último aluno
                 }
             }
         }
