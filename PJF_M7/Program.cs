@@ -1,37 +1,42 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.IO;
 
 namespace PJF_M7
 {
     class Program
     {
-        struct Falta
+        struct Falta // Definição da estrutura Falta que armazena disciplina e número de faltas.
         {
-            public string disciplina; // Membro que armazena o nome da disciplina.
-            public int faltas; // Membro que armazena o número de faltas.
+            public string disciplina; // Nome da disciplina.
+            public int faltas; // Número de faltas.
         }
 
-        struct Disciplina
+        struct Disciplina // Definição da estrutura Disciplina que armazena nome e nota da disciplina.
+
         {
-            public string nome; // Membro que armazena o nome da disciplina.
-            public double nota; // Membro que armazena a nota da disciplina.
+            public string nome; // Nome da disciplina.
+            public double nota; // Nota da disciplina.
         }
 
-        struct Aluno
+        struct Aluno // Definição da estrutura Aluno que contém nome, turma, número, disciplinas e faltas.
+
         {
-            public string nome; // Membro que armazena o nome do aluno.
-            public string turma; // Membro que armazena a turma do aluno.
-            public int numero; // Membro que armazena o número do aluno.
-            public Disciplina[] materia; // Membro que armazena um array de objetos Disciplina.
-            public Falta[] faltas; // Membro que armazena um array de objetos Falta.
+            public string nome; // Nome do aluno.
+            public string turma; // Turma do aluno.
+            public int numero; // Número do aluno.
+            public Disciplina[] materia; // Array de disciplinas do aluno.
+            public Falta[] faltas; // Array de faltas do aluno.
         }
 
-
-        struct UserAccount
+        struct UserAccount // Definição da estrutura UserAccount para armazenar credenciais de utilizador.
         {
-            private string user; // Membro privado do tipo string armazenar o nome de utilizador.
-            private string passwd; // Membro privado do tipo string para armazenar a senha do utilizador.
+            private string user; // Nome de utilizador privado.
+            private string passwd; // Senha privada.
 
             public string User
             {
@@ -45,52 +50,137 @@ namespace PJF_M7
                 set { passwd = value; } // Propriedade para definir a senha do utilizador.
             }
 
-            public UserAccount(string nameUser, string password)
+            public UserAccount(string nameUser, string password) // Construtor para inicializar UserAccount com nome de utilizador e senha.
             {
-                user = nameUser; // Inicializa o Membro user com o valor de nameUser.
-                passwd = password; // Inicializa o Membro passwd com o valor de password.
+                user = nameUser; // Inicializa o nome de utilizador.
+                passwd = password; // Inicializa a senha.
             }
         }
 
-        static string input, output = "Info Estudantes"; // Declaração de duas variáveis estáticas do tipo string para ser usada durante todo o decorrer do programa, sendo o input para ser escrita pela utilizador, e output para fins de salvamento de arquivo.
+        // Variáveis e vetores que serão usados de forma ampla durante o programa.
 
-        static int op; // Declaração de uma variável estática do tipo inteiro para ser usada durante todo o decorrer do programa.
-
-        static string[] subjects = new string[0]; // Vetor do tipo string para armazenar 
-
-        static readonly string[] files = { "nomes.txt", "notas.txt", "faltas.txt", "loginprofessores.txt" }; // vetor de quantidade 4, os quais indicam os nomes dos arquivos utilizados.
-
-        static string[] lines; // Vetor do tipo string para armazenar linhas dos arquivos.
-
-        static Aluno[] alunos = new Aluno[0]; // vetor do tipo Aluno.
+        static string input, output = "Info Estudantes"; // Variáveis para entrada e saída de dados.
+        static int op; // Variável para opção do menu.
+        static string[] subjects = new string[0]; // Vetor para armazenar disciplinas.
+        static readonly string[] files = { "nomes.txt", "notas.txt", "faltas.txt", "loginprofessores.txt" }; // Nomes dos arquivos.
+        static string[] lines; // Linhas dos arquivos.
+        static Aluno[] alunos = new Aluno[0]; // Vetor de alunos.
 
         static void Main(string[] args)
         {
-            Initializer(); // Chamada do método que inicia todo o programa.
+            Initializer(); // Inicializa o programa.
         }
 
-        static void LoadUsers() // Método para carregar as credenciais dos utilizadores do arquivo que está no índice 3 do vetor files, que é o loginprofessores.txt.
+        static void AdminMenu() // Menu de administração com opções para criar, deletar professores ou gerenciar turmas.
         {
-            if (File.Exists(files[3])) // Checa se o arquivo existe.
+            Console.WriteLine("1 - Criar professor" +
+                "\n2 - Deletar professor" +
+                "\n3 - Gerenciamento de turma");
+
+            Console.WriteLine("\nInsira a opção desejada: ");
+            input = Console.ReadLine();
+
+            switch (input)
             {
-                var lines = File.ReadAllLines(files[3]); // Lê todas as linhas do arquivo loginprofessores.txt.
+                case "1":
+                    CreateUser(); // Cria um novo professor.
+                    break;
+                case "2":
+                    DeleteUser(); // Deleta um professor.
+                    break;
+                case "3":
+                    ChooseOption(); // Opção para gerenciar turma.
+                    break;
+                default:
+                    Console.Clear();
+                    Console.WriteLine("\nOpção inválida\n");
+                    AdminMenu();
+                    break;
+            }
+        }
+
+        static void AdminLogin() // Função para fazer login como administrador.
+        {
+            UserAccount admin = new UserAccount("admin", "123"); // Cria um objeto de admin com nome e senha padrão.
+
+            Console.Clear();
+            Console.Write("Insira o nome de utilizador do admin: ");
+            string adminUser = Console.ReadLine();
+            Console.Write("Insira a senha do admin: ");
+            string adminPass = Console.ReadLine();
+
+            if (adminUser == admin.User && adminPass == admin.Passwd)
+            {
+                Console.Clear();
+                Console.WriteLine("\nLogin de administrador bem-sucedido!\n");
+                AdminMenu(); // Login bem-sucedido, mostra o menu de administração.
+            }
+            else
+            {
+                Console.WriteLine("\nCredenciais de administrador inválidas.\n");
+                Console.ReadKey();
+                LoginScreen(); // Credenciais inválidas, volta para a tela de login.
+            }
+        }
+
+        static void DeleteUser() // Função para deletar utilizador (professor) do sistema.
+        {
+            Console.Clear();
+            Console.Write("Insira o nome do utilizador a ser deletado: ");
+            string usernameToDelete = Console.ReadLine();
+
+            if (UserExists(usernameToDelete))
+            {
+                var lines = File.ReadAllLines(files[3]); // Lê todas as linhas do arquivo de login de professores.
+
+                using (StreamWriter sw = new StreamWriter(files[3]))
+                {
+                    foreach (var line in lines)
+                    {
+                        var data = line.Split(';');
+                        if (data.Length == 2 && !data[0].Equals(usernameToDelete, StringComparison.OrdinalIgnoreCase))
+                        {
+                            sw.WriteLine(line); // Escreve novamente as linhas no arquivo, exceto a linha do professor a ser deletado.
+                        }
+                    }
+                }
+                Console.WriteLine("Utilizador deletado com sucesso!"); // Mensagem de sucesso ao deletar utilizador.
+            }
+            else
+            {
+                Console.WriteLine("Utilizador não encontrado."); // Mensagem se o utilizador não for encontrado.
+            }
+            Console.WriteLine("Pressione qualquer tecla para voltar ao menu...");
+            Console.ReadKey();
+            Console.Clear(); // Limpa a tela do cmd.
+            AdminMenu(); // Retorna ao menu de administração.
+        }
+
+        static void LoadUsers() // Função para carregar os utilizadores (professores) do arquivo de credenciais.
+        {
+            if (File.Exists(files[3])) // Verifica se o arquivo existe.
+            {
+                var lines = File.ReadAllLines(files[3]); // Lê todas as linhas do arquivo de login de professores.
+
                 foreach (var line in lines)
                 {
-                    var data = line.Split(';'); // Divide cada linha do arquivo pelos caracteres ';'.
+                    var data = line.Split(';'); // Divide cada linha pelo caractere ';'.
+
                     if (data.Length == 2)
                     {
-                        UserAccount user = new UserAccount(data[0], data[1]); // Cria um novo objeto UserAccount com os dados do utilizador.
+                        UserAccount user = new UserAccount(data[0], data[1]); // Cria um novo UserAccount com nome de utilizador e senha.
+                        Console.WriteLine($"Utilizador {data[0]} foi carregado."); // Informa que o utilizador foi carregado.
                     }
                 }
                 Console.WriteLine("\nCredenciais carregadas\n"); // Informa que as credenciais foram carregadas.
             }
-            else // Se o arquivo não existir, avisa o utilizador do programa pela seguinte mensagem:
+            else
             {
-                Console.WriteLine("\n O arquivo de credenciais não existe, registe um utilizador para criar o arquivo automaticamente.\n"); // Informa que o arquivo não existe e pede para registar um novo utilizador.
+                Console.WriteLine("\n O arquivo de credenciais não existe, registe um utilizador para criar o arquivo automaticamente.\n"); // Informa que o arquivo de credenciais não existe.
             }
         }
 
-        static void CreateUser() // Método para criar um utilizador para que seja possível acessar o menu através do login.
+        static void CreateUser() // Função para criar um novo utilizador (professor).
         {
             UserAccount newUser;
 
@@ -101,69 +191,71 @@ namespace PJF_M7
             if (username == "0") LoginScreen(); // Volta para a tela de login se o utilizador digitar "0".
 
             Console.Write("(Digite 0 para sair) Insira uma senha: ");
-            string password = Console.ReadLine(); // Lê a senha do utilizador.
+            string password = Console.ReadLine(); // Lê a senha.
 
             if (password == "0") LoginScreen(); // Volta para a tela de login se o utilizador digitar "0".
 
             Console.Write("(Digite 0 para sair) Confirme a senha: ");
-            string confirmPassword = Console.ReadLine(); // Lê a confirmação da senha.
+            string confirmPassword = Console.ReadLine(); // Confirmação da senha.
 
             if (confirmPassword == "0") LoginScreen(); // Volta para a tela de login se o utilizador digitar "0".
 
             while (confirmPassword != password)
             {
-                Console.WriteLine("As senhas não coincidem. Tente novamente."); // Informa que as senhas não coincidem e pede para tentar novamente.
+                Console.WriteLine("As senhas não coincidem. Tente novamente."); // Mensagem se as senhas não coincidirem.
 
                 Console.Write($"Insira a senha de {username}: ");
                 password = Console.ReadLine(); // Lê a senha novamente.
 
                 Console.Write("Confirme a senha: ");
-                confirmPassword = Console.ReadLine(); // Lê a confirmação da senha novamente.
+                confirmPassword = Console.ReadLine(); // Confirmação da senha novamente.
             }
 
             if (UserExists(username) == true)
             {
-                Console.WriteLine("Este utilizador já existe"); // Informa que o utilizador já existe.
+                Console.WriteLine("Este utilizador já existe"); // Mensagem se o utilizador já existir.
                 Console.WriteLine("Pressione qualquer tecla para voltar ao menu de login...");
                 Console.ReadKey();
-                LoginScreen(); // Volta para a tela de login.
+                LoginScreen(); // Retorna para a tela de login.
             }
             else
             {
                 if (!File.Exists(files[3]))
                 {
-                    File.Create(files[3]).Close(); // Cria o arquivo loginprofessores.txt se não existir.
+                    File.Create(files[3]).Close(); // Cria o arquivo de login de professores se não existir.
                 }
 
-                newUser = new UserAccount(username, password); // Cria um novo objeto UserAccount com o nome de utilizador e a senha.
+                newUser = new UserAccount(username, password); // Cria um novo objeto UserAccount com nome de utilizador e senha.
 
                 using (StreamWriter sw = new StreamWriter(files[3], true))
                 {
-                    sw.WriteLine($"{newUser.User};{newUser.Passwd}"); // Escreve o novo utilizador no arquivo loginprofessores.txt.
+                    sw.WriteLine($"{newUser.User};{newUser.Passwd}"); // Escreve o novo utilizador no arquivo de login de professores.
                 }
 
-                Console.WriteLine("Utilizador registado com sucesso!"); // Informa que o utilizador foi registado com sucesso.
+                Console.WriteLine("Utilizador registado com sucesso!"); // Mensagem de sucesso ao registrar utilizador.
                 Console.WriteLine("Pressione qualquer tecla para voltar ao menu... ");
                 Console.ReadKey();
-                LoginScreen(); // Volta para a tela de login.
+                LoginScreen(); // Retorna para a tela de login.
             }
         }
 
-        static bool UserExists(string username) // Método para verificar se o utilizador já existe.
+        static bool UserExists(string username) // Função para verificar se o utilizador já existe.
         {
-            if (File.Exists(files[3]))
+            if (File.Exists(files[3])) // Verifica se o arquivo existe.
             {
-                var lines = File.ReadAllLines(files[3]); // Lê todas as linhas do arquivo loginprofessores.txt.
+                var lines = File.ReadAllLines(files[3]); // Lê todas as linhas do arquivo de login de professores.
+
                 foreach (var line in lines)
                 {
-                    var data = line.Split(';'); // Divide cada linha do arquivo pelos caracteres ';'.
+                    var data = line.Split(';'); // Divide cada linha pelo caractere ';'.
+
                     if (data.Length == 2 && data[0].Equals(username, StringComparison.OrdinalIgnoreCase))
                     {
-                        return true; // Retorna true se o nome de utilizador já existir.
+                        return true; // Retorna verdadeiro se o nome de utilizador existir no arquivo.
                     }
                 }
             }
-            return false; // Retorna false se o nome de utilizador não existir.
+            return false; // Retorna falso se o nome de utilizador não existir no arquivo.
         }
 
         static void LoginScreen() // Método para mostrar a tela de login.
@@ -171,7 +263,7 @@ namespace PJF_M7
             Console.Clear();
             LoadUsers(); // Carrega as credenciais dos utilizadores.
             LoginMenu(); // Mostra o menu de login.
-            Console.Write("Insira a opção: ");
+            Console.Write("\nInsira a opção: ");
             input = Console.ReadLine(); // Lê a opção escolhida pelo utilizador.
             switch (input)
             {
@@ -179,7 +271,7 @@ namespace PJF_M7
                     StartLogin(); // Inicia o processo de login.
                     break;
                 case "2":
-                    CreateUser(); // Inicia o processo de criação de um novo utilizador.
+                    AdminLogin();           
                     break;
                 case "0":
                     Environment.Exit(0); // Sai do programa.
@@ -239,9 +331,9 @@ namespace PJF_M7
 
         static void LoginMenu() // Método para mostrar o menu de login.
         {
-            Console.WriteLine("1. Logar" +
-                "\n2. Registar" +
-                "\n0. Sair"); // Opções do menu de login.
+            Console.WriteLine("1 - Logar como professor" +
+                "\n2 - Logar como admin" +
+                "\n0 - Sair"); // Opções do menu de login.
         }
 
 
@@ -333,6 +425,7 @@ namespace PJF_M7
                 "\n5 - Adiciona uma disciplina a um estudante" +
                 "\n6 - Remove uma disciplina a um estudante" +
                 "\n7 - Mostra as informações de todos os arquivos usados pelo o programa" +
+                "\n8 - Voltar a tela de menu" +
                 "\n0 - Salva e fecha do programa"
                 );
         }
@@ -371,6 +464,9 @@ namespace PJF_M7
                         break;
                     case "7":
                         FilesInfo();
+                        break;
+                    case "8":
+                        LoginScreen();
                         break;
                     case "0":
                         input = "\u0000";
