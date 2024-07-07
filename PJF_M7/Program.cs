@@ -628,19 +628,26 @@ namespace PJF_M7
             Console.WriteLine("\n");
         }
 
-        static void OutputInfo()
+                static void OutputInfo()
         {
             if (alunos.Length > 0)
             {
                 bool check;
-                Console.WriteLine("1 - Listar as notas de todos os alunos em todas as disciplina" +
+                Console.WriteLine("1 - Listar as notas de todos os alunos em todas as disciplinas" +
                     "\n2 - Listar todas as faltas de todos os alunos em todas as disciplinas" +
-                    "\n0 - Cancela a execução");
-                Console.Write("\nEscolha uma das opções a cima: ");
-                if (!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), output))) Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), output));
+                    "\n0 - Cancelar a execução");
+                Console.Write("\nEscolha uma das opções acima: ");
+
+                // Verifica se o diretório de saída existe no desktop, senão o cria.
+                if (!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), output)))
+                    Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), output));
+
+                // Define os caminhos para os arquivos de notas e faltas com a data atual.
                 string pathGrades = Path.Combine(new string[] { Environment.GetFolderPath(Environment.SpecialFolder.Desktop), output, $"Notas - {DateTime.Now:dd-MM-yyyy}" });
                 string pathAbsences = Path.Combine(new string[] { Environment.GetFolderPath(Environment.SpecialFolder.Desktop), output, $"Faltas - {DateTime.Now:dd-MM-yyyy}" });
                 string extra = "";
+
+                // Popula o array de subjects com todas as disciplinas dos alunos.
                 for (int i = 0; i < alunos.Length; i++)
                 {
                     if (alunos[i].materia.Length > 0)
@@ -653,14 +660,16 @@ namespace PJF_M7
                             }
                         }
                 }
+
                 do
                 {
                     check = true;
                     switch (Console.ReadLine())
                     {
-                        case "1":
+                        case "1": // Listar as notas de todos os alunos em todas as disciplinas.
                             if (subjects.Length > 0)
                             {
+                                // Verifica se o arquivo de notas existe, senão o cria.
                                 if (!File.Exists(pathGrades + ".txt")) File.Create(pathGrades + ".txt").Close();
                                 else
                                 {
@@ -673,6 +682,7 @@ namespace PJF_M7
 
                                 using (StreamWriter writer = new StreamWriter(pathGrades + extra + ".txt"))
                                 {
+                                    // Escreve as notas de todos os alunos por disciplina.
                                     for (int i = 0; i < subjects.Length; i++)
                                     {
                                         writer.WriteLine(subjects[i] + "\n");
@@ -688,11 +698,13 @@ namespace PJF_M7
                                     writer.Close();
                                 }
                             }
-                            else Console.WriteLine("Não existem registros de disciplinas");
+                            else Console.WriteLine("Não existem registros de disciplinas.");
                             break;
-                        case "2":
+
+                        case "2": // Listar todas as faltas de todos os alunos em todas as disciplinas.
                             if (subjects.Length > 0)
                             {
+                                // Verifica se o arquivo de faltas existe, senão o cria.
                                 if (!File.Exists(pathAbsences + ".txt")) File.Create(pathAbsences + ".txt").Close();
                                 else
                                 {
@@ -705,6 +717,7 @@ namespace PJF_M7
 
                                 using (StreamWriter writer = new StreamWriter(pathAbsences + extra + ".txt"))
                                 {
+                                    // Escreve as faltas de todos os alunos por disciplina.
                                     for (int i = 0; i < subjects.Length; i++)
                                     {
                                         writer.Write(subjects[i] + "\n");
@@ -720,19 +733,22 @@ namespace PJF_M7
                                     writer.Close();
                                 }
                             }
-                            else Console.WriteLine("Não existem registros de faltas em todas as disciplinas");
+                            else Console.WriteLine("Não existem registros de faltas em todas as disciplinas.");
                             break;
-                        case "0":
+
+                        case "0": // Cancelar a execução.
                             break;
-                        default:
+
+                        default: // Opção inválida.
                             Console.Write("Opção inválida, tente novamente: ");
                             check = false;
                             break;
                     }
                 } while (!check);
-                Array.Resize(ref subjects, 0);
+
+                Array.Resize(ref subjects, 0); // Limpa o array de subjects.
             }
-            else Console.WriteLine("Não existem alunos registrados");
+            else Console.WriteLine("Não existem alunos registrados.");
 
             Console.WriteLine("\n");
         }
