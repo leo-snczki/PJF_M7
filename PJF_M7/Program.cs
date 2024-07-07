@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -334,15 +334,15 @@ namespace PJF_M7
                 "\n2 - Logar como admin" +
                 "\n0 - Sair"); // Opções do menu de login.
         }
-
-
         static void Initializer()
         {
-            if (File.Exists(files[0]) || File.Exists(files[0] + ".bak")) 
+            if (File.Exists(files[0]) || File.Exists(files[0] + ".bak"))
             {
                 if (!File.Exists(files[0]) && File.Exists(files[0] + ".bak")) File.Copy(files[0] + ".bak", files[0], true);
+
                 lines = File.ReadAllLines(files[0]);
                 Array.Resize(ref alunos, lines.Length / 3);
+
                 int i = 0;
                 for (int j = 0; j < lines.Length; j += 3)
                 {
@@ -354,11 +354,12 @@ namespace PJF_M7
                     i++;
                 }
             }
-            else File.Create(files[0]).Close();
+            else File.Create(files[0]).Close(); 
 
             if (File.Exists(files[1]) || File.Exists(files[1] + ".bak"))
             {
                 if (!File.Exists(files[1]) && File.Exists(files[1] + ".bak")) File.Copy(files[1] + ".bak", files[1], true);
+
                 lines = File.ReadAllText(files[1]).Split(new char[] { 'b' }, StringSplitOptions.None);
 
                 for (int i = 0; i < lines.Length; i++)
@@ -366,11 +367,11 @@ namespace PJF_M7
                     int k = 0;
 
                     string[] sublines = lines[i].Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-                    
+
                     if (sublines.Length > 0)
                     {
                         alunos[i].materia = new Disciplina[0];
-                        
+
                         Array.Resize(ref alunos[i].materia, sublines.Length / 2);
 
                         for (int j = 0; j < sublines.Length; j += 2)
@@ -384,10 +385,12 @@ namespace PJF_M7
             }
             else File.Create(files[1]).Close();
 
-            if (File.Exists(files[2]) || File.Exists(files[2] + ".bak") )
+            if (File.Exists(files[2]) || File.Exists(files[2] + ".bak"))
             {
                 if (!File.Exists(files[2]) && File.Exists(files[2] + ".bak")) File.Copy(files[2] + ".bak", files[2], true);
+
                 lines = File.ReadAllText(files[2]).Split(new char[] { 'b' }, StringSplitOptions.None);
+
                 for (int i = 0; i < lines.Length; i++)
                 {
                     int k = 0;
@@ -409,7 +412,11 @@ namespace PJF_M7
                     }
                 }
             }
-            else File.Create(files[2]).Close();
+            else
+            {
+                File.Create(files[2]).Close();
+            }
+
             LoginScreen();
             ChooseOption();
         }
@@ -417,15 +424,15 @@ namespace PJF_M7
         static void ShowMenu()
         {
             Console.WriteLine(
-                $"1 - Salva as informações dos estudantes na pasta '{output}' que localiza-se em 'Ambiente de trabalho'" +
-                "\n2 - Adiciona um estudante" +
-                "\n3 - Remove um estudante" +
-                "\n4 - Edita as informações de um estudante" +
-                "\n5 - Adiciona uma disciplina a um estudante" +
-                "\n6 - Remove uma disciplina a um estudante" +
-                "\n7 - Mostra as informações de todos os arquivos usados pelo o programa" +
-                "\n8 - Voltar a tela de menu" +
-                "\n0 - Salva e fecha do programa"
+                $"1 - Guardar as informações dos estudantes na pasta '{output}' localizada no Ambiente de trabalho" +
+                "\n2 - Adicionar um estudante" +
+                "\n3 - Remover um estudante" +
+                "\n4 - Editar as informações de um estudante" +
+                "\n5 - Adicionar uma disciplina a um estudante" +
+                "\n6 - Remover uma disciplina a um estudante" +
+                "\n7 - Mostrar as informações de todos os ficheiros utilizados pelo programa" +
+                "\n8 - Voltar ao ecrã de menu" +
+                "\n0 - Guardar e fechar o programa"
                 );
         }
 
@@ -441,6 +448,7 @@ namespace PJF_M7
                 }
                 check = true;
                 input = Console.ReadLine();
+
                 switch (input)
                 {
                     case "1":
@@ -476,8 +484,10 @@ namespace PJF_M7
                         break;
                 }
             } while (input != "\u0000");
+
             Saver();
         }
+
 
         static void RemoveSubject()
         {
