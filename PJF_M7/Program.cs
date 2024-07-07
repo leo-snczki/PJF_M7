@@ -754,7 +754,7 @@ namespace PJF_M7
                     Console.Write("Já existe um aluno com esse nome: ");
             } while ((input.Length < 3 || Array.FindIndex(alunos, s => s.nome.ToLower() == input.ToLower()) != -1) && input != "");
 
-            // Se o usuário não cancelou (digitou algo)
+            // Se o utilizador não cancelou digitou algo
             if (input != "")
             {
                 Array.Resize(ref alunos, alunos.Length + 1); // Aumenta o tamanho do array de alunos
